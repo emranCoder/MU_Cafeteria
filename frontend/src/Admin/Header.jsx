@@ -8,8 +8,11 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import CloseIcon from "@mui/icons-material/Close";
 import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
 import CategoryIcon from "@mui/icons-material/Category";
+import ContactsIcon from "@mui/icons-material/Contacts";
 import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
+import GroupsIcon from "@mui/icons-material/Groups";
 import { NavLink } from "react-router-dom";
+import logo from "../img/orderNow.png";
 
 export default function Header() {
   const [drawerActive, setDrawerActive] = useState({
@@ -67,11 +70,7 @@ export default function Header() {
             href="/dashboard"
             className="lg:flex items-center space-x-3 rtl:space-x-reverse hidden"
           >
-            <img
-              src="https://flowbite.com/docs/images/logo.svg"
-              className="h-8"
-              alt="Flowbite Logo"
-            />
+            <img src={logo} className="h-12" alt="Flowbite Logo" />
             <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
               OrderNow
             </span>
@@ -82,35 +81,15 @@ export default function Header() {
           href="/dashboard"
           className="max-lg:flex items-center space-x-3 rtl:space-x-reverse hidden"
         >
-          <img
-            src="https://flowbite.com/docs/images/logo.svg"
-            className="h-8"
-            alt="Flowbite Logo"
-          />
-          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+          <img src={logo} className="h-9 max-sm:h-12 " alt="logo" />
+          <span className="self-center  max-sm:hidden  text-2xl font-semibold whitespace-nowrap dark:text-white">
             OrderNow
           </span>
         </a>
 
         <div className="navbar-end">
-          <button className="btn btn-ghost btn-circle lg:block hidden">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </button>
           <div className="dropdown dropdown-end">
-            <button className="btn btn-ghost btn-circle lg:block hidden">
+            <button className="btn btn-ghost btn-circle hidden  lg:flex md:flex  just-center items-center mr-5">
               <div className="indicator">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -140,9 +119,6 @@ export default function Header() {
                 </a>
               </li>
               <li>
-                <a>Settings</a>
-              </li>
-              <li>
                 <a>Logout</a>
               </li>
             </ul>
@@ -166,13 +142,9 @@ export default function Header() {
               className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
             >
               <li>
-                <a href="#" className="justify-between">
+                <NavLink to="setting" className="justify-between">
                   Profile
-                  <span className="badge">New</span>
-                </a>
-              </li>
-              <li>
-                <a>Settings</a>
+                </NavLink>
               </li>
               <li>
                 <a>Logout</a>
@@ -184,9 +156,9 @@ export default function Header() {
       {drawerActive["left"] && (
         <div className="dark-bg" onClick={toggleDrawer("left", false)}></div>
       )}
-      <Mui.Slide direction="right" in={drawerActive["left"]} timeout={500}>
+      <Mui.Slide direction="right" in={drawerActive["left"]} timeout={300}>
         <nav
-          className="text-slate-400 nav absolute top-0 w-4/6"
+          className="text-slate-400 nav pb-14 absolute top-0 w-4/6"
           aria-label="main mailbox folders"
         >
           <div
@@ -211,27 +183,49 @@ export default function Header() {
                 <span className="font-semibold text-sm">Dashboard</span>
               </Mui.ListItemButton>
             </NavLink>
-            <Mui.ListItemButton className="font-thin item-btn">
-              <span className="mr-5">
-                <SellIcon fontSize="small" className="icon" />
-              </span>
-              <span className="font-semibold text-sm">All Orders</span>
-            </Mui.ListItemButton>
-            <Mui.ListItemButton className="font-thin item-btn">
-              <span className="mr-5">
-                <ProductionQuantityLimitsIcon
-                  fontSize="small"
-                  className="icon"
-                />
-              </span>
-              <span className="font-semibold text-sm">Current Orders</span>
-            </Mui.ListItemButton>
-            <Mui.ListItemButton className="font-thin item-btn">
-              <span className="mr-5">
-                <PaidIcon fontSize="small" className="icon" />
-              </span>
-              <span className="font-semibold text-sm">Payment Status</span>
-            </Mui.ListItemButton>
+            <NavLink to="all-order">
+              <Mui.ListItemButton className="font-thin item-btn">
+                <span className="mr-5">
+                  <SellIcon fontSize="small" className="icon" />
+                </span>
+                <span className="font-semibold text-sm">All Orders</span>
+              </Mui.ListItemButton>
+            </NavLink>
+            <NavLink to="current-order">
+              <Mui.ListItemButton className="font-thin item-btn">
+                <span className="mr-5">
+                  <ProductionQuantityLimitsIcon
+                    fontSize="small"
+                    className="icon"
+                  />
+                </span>
+                <span className="font-semibold text-sm">Current Order</span>
+              </Mui.ListItemButton>
+            </NavLink>
+            <NavLink to="payment-status">
+              <Mui.ListItemButton className="font-thin item-btn">
+                <span className="mr-5">
+                  <PaidIcon fontSize="small" className="icon" />
+                </span>
+                <span className="font-semibold text-sm">Payment Status</span>
+              </Mui.ListItemButton>
+            </NavLink>
+            <NavLink to="staff">
+              <Mui.ListItemButton className="font-thin item-btn">
+                <span className="mr-5">
+                  <GroupsIcon fontSize="small" className="icon" />
+                </span>
+                <span className="font-semibold text-sm">Staff</span>
+              </Mui.ListItemButton>
+            </NavLink>
+            <NavLink to="product">
+              <Mui.ListItemButton className="font-thin item-btn">
+                <span className="mr-5">
+                  <ShoppingBasketIcon fontSize="small" className="icon" />
+                </span>
+                <span className="font-semibold text-sm">Product</span>
+              </Mui.ListItemButton>
+            </NavLink>
             <NavLink to="category">
               <Mui.ListItemButton className="font-thin item-btn">
                 <span className="mr-5">
@@ -240,21 +234,26 @@ export default function Header() {
                 <span className="font-semibold text-sm">Category</span>
               </Mui.ListItemButton>
             </NavLink>
-            <Mui.ListItemButton className="font-thin item-btn">
-              <span className="mr-5">
-                <ShoppingBasketIcon fontSize="small" className="icon" />
-              </span>
-              <span className="font-semibold text-sm">Add Product</span>
-            </Mui.ListItemButton>
+            <NavLink to="user">
+              <Mui.ListItemButton className="font-thin item-btn">
+                <span className="mr-5">
+                  <ContactsIcon fontSize="small" className="icon" />
+                </span>
+                <span className="font-semibold text-sm">Customers</span>
+              </Mui.ListItemButton>
+            </NavLink>
+
             <div className="my-5">
               <Mui.Divider className="bg-slate-700 " />
             </div>
-            <Mui.ListItemButton className="font-thin item-btn">
-              <span className="mr-5">
-                <SettingsIcon fontSize="small" className="icon" />
-              </span>
-              <span className="font-semibold text-sm">Setting</span>
-            </Mui.ListItemButton>
+            <NavLink to="setting">
+              <Mui.ListItemButton className="font-thin item-btn">
+                <span className="mr-5">
+                  <SettingsIcon fontSize="small" className="icon" />
+                </span>
+                <span className="font-semibold text-sm">Setting</span>
+              </Mui.ListItemButton>
+            </NavLink>
             <Mui.ListItemButton className="font-thin item-btn">
               <span className="mr-5">
                 <LogoutIcon fontSize="small" className="icon" />

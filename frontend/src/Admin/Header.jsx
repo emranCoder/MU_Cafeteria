@@ -13,8 +13,12 @@ import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantity
 import GroupsIcon from "@mui/icons-material/Groups";
 import { NavLink } from "react-router-dom";
 import logo from "../img/orderNow.png";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { useSelector } from "react-redux";
 
 export default function Header() {
+  const { isLoading, user, err } = useSelector((state) => state.user);
   const [drawerActive, setDrawerActive] = useState({
     left: false,
     bottom: false,
@@ -34,6 +38,30 @@ export default function Header() {
     if (anchor === "bottom") setDrawerActive({ bottom: open });
     if (anchor === "right") setDrawerActive({ right: open });
     if (anchor === "top") setDrawerActive({ top: open });
+  };
+
+  const logOut = async () => {
+    const token = Cookies.get("auth");
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/login/logout`,
+        {
+          headers: {
+            token: token,
+          },
+        }
+      );
+      if (response && response.status === 200) {
+        Cookies.remove("auth");
+        Cookies.remove("id");
+        window.location.replace("/admin-login?true=forget");
+      }
+    } catch (error) {
+      console.log(error.response);
+      if (error.message === "Network Error")
+        return console.error(error.message);
+      console.log(error.response.data.message);
+    }
   };
 
   return (
@@ -115,11 +143,16 @@ export default function Header() {
               <li>
                 <a href="#" className="justify-between">
                   Profile
-                  <span className="badge">New</span>
                 </a>
               </li>
               <li>
-                <a>Logout</a>
+                <a
+                  onClick={() => {
+                    logOut();
+                  }}
+                >
+                  Logout
+                </a>
               </li>
             </ul>
           </div>
@@ -132,8 +165,11 @@ export default function Header() {
             >
               <div className="w-10 rounded-full">
                 <img
-                  alt="Tailwind CSS Navbar component"
-                  src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
+                  alt="loading"
+                  src={
+                    (user && `http://localhost:5000/avatar/${user.avatar}`) ||
+                    "default-avatar.png"
+                  }
                 />
               </div>
             </div>
@@ -147,7 +183,13 @@ export default function Header() {
                 </NavLink>
               </li>
               <li>
-                <a>Logout</a>
+                <a
+                  onClick={() => {
+                    logOut();
+                  }}
+                >
+                  Logout
+                </a>
               </li>
             </ul>
           </div>
@@ -254,11 +296,16 @@ export default function Header() {
                 <span className="font-semibold text-sm">Setting</span>
               </Mui.ListItemButton>
             </NavLink>
-            <Mui.ListItemButton className="font-thin item-btn">
+            <Mui.ListItemButton
+              onClick={() => {
+                logOut();
+              }}
+              className="font-thin item-btn"
+            >
               <span className="mr-5">
                 <LogoutIcon fontSize="small" className="icon" />
               </span>
-              <span className="font-semibold text-sm">Logout</span>
+              <span>Logout</span>
             </Mui.ListItemButton>
           </div>
         </nav>

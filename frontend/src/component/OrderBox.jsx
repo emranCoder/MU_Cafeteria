@@ -1,49 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import FoodItem from "./FoodItem";
-import OrderMenuBox from "./OrderMenuBox";
-import { Grid, Container } from "@mui/material";
 import FooterMenu from "./FooterMenu";
-import { styled } from "@mui/material/styles";
-import Paper from "@mui/material/Paper";
-
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: "center",
-  color: theme.palette.text.secondary,
-  boxShadow: "none",
-}));
+import OrderMenuBox from "./OrderMenuBox";
+import Loading from "../component/Loading";
 
 export default function OrderBox() {
+  const [loader, setLoader] = useState(true);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    setTimeout(() => {
+      setLoader(false);
+    }, 500);
+  }, [0]);
+
   return (
-    <div>
-      <Container
-        className="bg-white shadow-lg  rounded-xl p-0"
-        sx={{ flexGrow: 1 }}
-      >
-        <Grid
-          container
-          direction={"row"}
-          justifyContent={"center"}
-          className="mt-5"
-        >
-          {/* <Grid item lg={3} md={3}> */}
-          <Grid item xs={3}>
-            <Item>
+    <section className="order-section py-5">
+      {loader && <Loading />}
+      <div className="container">
+        <div className="order-box bg-white max-sm:px-2 rounded-xl p-10 max-sm:p-4">
+          <div className="container-row">
+            <div className="col-lg-12 max-lg:hidden !sticky top-2 mb-5 z-[11]">
               <OrderMenuBox />
-            </Item>
-          </Grid>
-          {/* <Grid item lg={9} md={9}> */}
-          <Grid item xs={9}>
-            <Item>
-              {" "}
+            </div>
+            <div className="col-lg-12 col-md-12 max-w-full max-lg:w-full max-sm:px-4  ">
               <FoodItem />
-            </Item>
-          </Grid>
-        </Grid>
-      </Container>
+            </div>
+          </div>
+        </div>
+      </div>
       <FooterMenu />
-    </div>
+    </section>
   );
 }

@@ -647,6 +647,21 @@ body {
     color: rgb(255, 255, 255);
 }
 
+.navbar-ul li {
+    color: rgb(71, 85, 105);
+    padding: 0px 10px;
+}
+
+.navbar-ul li:hover {
+    color: rgb(153 27 27) !important;
+    transition: 0.5s;
+
+}
+
+.navbar-ul .active>li {
+    color: rgb(153 27 27);
+}
+
 .box-right {
     position: fixed;
     overflow-y: auto;
@@ -658,6 +673,7 @@ body {
 .MuiBadge-badge {
     background-color: #b45309 !important;
 }
+
 
 /***** End Universal Class *****/
 
@@ -741,4 +757,11 @@ body {
 
 .MuiInputBase-root.MuiInputBase-colorPrimary.MuiTablePagination-input.css-16c50h-MuiInputBase-root-MuiTablePagination-select {
     margin: 2px;
+}
+
+.menu li> :not(ul, .menu-title, details, .btn):active,
+.menu li> :not(ul, .menu-title, details, .btn).active,
+.menu li>details>summary:active {
+    background-color: rgb(51 65 85 / var(--tw-bg-opacity)) !important;
+    color: white !important;
 }

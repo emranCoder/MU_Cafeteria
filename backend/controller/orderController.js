@@ -15,9 +15,8 @@ const placeOrder = async (req, res) => {
         const addOrder = await newOrder.save();
         if (!addOrder) { return res.res.status(500).send({ err: "Unable to add order!" }); }
 
-        res.status(200).json({ mess: "Order added Successfully!", id: addOrder._id });
+        res.status(200).json({ message: "Order added Successfully!", id: addOrder._id });
     } catch (error) {
-        console.log(error);
         res.status(500).send({
             err: "Bad request!"
         });
@@ -28,35 +27,15 @@ const getAllOrder = async (req, res) => {
 
     try {
 
-        const orders = await Order.find().
-            sort({ orderDate: '1' }).populate('user', 'fName lName').populate("products");
+        const products = await Order.find();
 
-        if (!orders) {
+        if (!products) {
             return res.status(404).json({ err: "False Attempted!" });
         }
-        let x = 0;
-        orders.map((val, key) => (x += parseFloat(val.orderPrice)))
-        res.status(200).json({ order: orders, total: x });
+        res.status(200).json({ products: products });
 
     } catch (error) {
 
-        res.status(500).send({ err: "Bad request!" });
-    }
-}
-
-const getUserOrder = async (req, res) => {
-
-    try {
-
-        const order = await Order.find({ user: req.params.id }).populate('products');
-
-        if (!order) {
-            return res.status(404).json({ err: "False Attempted!" });
-        }
-        res.status(200).json({ order: order });
-
-    } catch (error) {
-        console.log(error)
         res.status(500).send({ err: "Bad request!" });
     }
 }
@@ -64,12 +43,12 @@ const getUserOrder = async (req, res) => {
 const getOrder = async (req, res) => {
 
     try {
-        const order = await Order.findById(req.params.id);
+        const products = await Order.findById(req.params.id);
 
-        if (!order) {
+        if (!products) {
             return res.status(404).json({ err: "False Attempted!" });
         }
-        res.status(200).json({ order: order });
+        res.status(200).json({ products: products });
 
     } catch (error) {
         res.status(500).send({ err: "Bad request!" });
@@ -85,7 +64,7 @@ const updateOrder = async (req, res) => {
                 err: "Server is down!"
             });
         }
-        res.status(200).json({ mess: "You got an update!" });
+        res.status(200).json({ mess: "You got a update!" });
     } catch (error) {
         res.status(500).send({
             err: "Bad request!"
@@ -121,4 +100,4 @@ const removeOrder = async (req, res) => {
 }
 
 
-module.exports = { placeOrder, getAllOrder, getOrder, updateOrder, getUserOrder, removeOrder };
+module.exports = { placeOrder, getAllOrder, getOrder, updateOrder, removeOrder };

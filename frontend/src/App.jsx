@@ -1,27 +1,15 @@
-import React, { useEffect } from "react";
+import * as React from "react";
 import "./App.css";
 import NavBar from "./component/NavBar";
+import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
-import Footer from "./component/Footer";
-import AlertError from "./component/AlertError";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchUser } from "./redux/AuthSlice";
 
 function App() {
-  const dispatch = useDispatch();
-  const { isLoading, user, err } = useSelector((state) => state.user);
-  useEffect(() => {
-    dispatch(fetchUser());
-  }, [0]);
-
   return (
-    <div className="bg-gray-100 ">
+    <Box className="bg-rose-300 h-screen" sx={{ flexGrow: 1 }}>
       <NavBar />
-
-      <AlertError />
       <Outlet />
-      <Footer />
-    </div>
+    </Box>
   );
 }
 

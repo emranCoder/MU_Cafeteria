@@ -1,15 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { placeOrder, getOrder, updateOrder, getAllOrder, getUserOrder, removeOrder } = require('../controller/orderController');
-const authCheck = require('../middleware/authHandler');
+const { placeOrder, getOrder, updateOrder } = require('../controller/orderController');
 
 
-router.post('/', authCheck, placeOrder);
-router.get('/all', authCheck, getAllOrder);
-router.get('/user/:id', authCheck, getUserOrder);
-router.get('/:id', authCheck, getOrder);
-router.put('/', authCheck, updateOrder);
-router.delete('/', authCheck, removeOrder);
+router.post('/', placeOrder);
+// router.get('/all', getAllOrder);
+router.get('/:id', getOrder);
+router.put('/', updateOrder);
+// router.delete('/', removeOrder);
 
 
 module.exports = router;

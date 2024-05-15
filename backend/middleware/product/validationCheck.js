@@ -6,6 +6,7 @@ const { check, validationResult } = require('express-validator');
 const productValidates = [
     check('name', 'Invalid Product Name').not().isEmpty(),
     check('price', 'Invalid original price.').not().isEmpty(),
+    check('currentPrice', 'Invalid product current price.').not().isEmpty(),
     check('category', 'Invalid Category.').not().isEmpty(),
 ];
 

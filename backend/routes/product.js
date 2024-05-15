@@ -5,11 +5,11 @@ const imageUpload = require('../middleware/product/imageUpload');
 const authCheck = require('../middleware/authHandler');
 const { productValidates, productValidation, imageValidation } = require('../middleware/product/validationCheck');
 
-router.post('/', authCheck, imageUpload, productValidates, productValidation, imageValidation, addProduct);
+router.post('/', imageUpload, productValidates, productValidation, imageValidation, addProduct);
 router.get('/all', getAllProduct);
 router.get('/:id', getProduct);
-router.put('/', authCheck, imageUpload, productValidation, imageValidation, updateProduct);
-router.delete('/', authCheck, removeProduct);
+router.put('/', updateProduct);
+router.delete('/', removeProduct);
 
 
 module.exports = router;

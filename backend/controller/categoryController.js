@@ -28,12 +28,12 @@ const getAllCategory = async (req, res) => {
 
     try {
 
-        const category = await Category.find();
+        const products = await Category.find();
 
-        if (!category) {
+        if (!products) {
             return res.status(404).json({ err: "False Attempted!" });
         }
-        res.status(200).json({ category: category });
+        res.status(200).json({ products: products });
 
     } catch (error) {
 
@@ -65,7 +65,7 @@ const updateCategory = async (req, res) => {
                 err: "Server is down!"
             });
         }
-        res.status(200).json({ message: "You got an update!" });
+        res.status(200).json({ mess: "You got a update!" });
     } catch (error) {
         res.status(500).send({
             err: "Bad request!"
@@ -79,11 +79,11 @@ const removeCategory = async (req, res) => {
 
         if (!category) {
             return res.status(404).send({
-                err: "Server is down!"
+                err: "Ser ver is down!"
             });
         }
         const fileName = category.image;
-        if (!(fileName === "default-product.png")) {
+        if (!(fileName === "default-avatar.png")) {
             const fileDest = '../public/uploads/categories/';
 
             fs.unlink(path.join(__dirname, fileDest + fileName), (err) => {
@@ -92,7 +92,7 @@ const removeCategory = async (req, res) => {
                 }
             });
         }
-        res.status(200).json({ message: "Deleted Successfully!" });
+        res.status(200).json({ mess: "Deleted Successfully!" });
     } catch (error) {
         res.status(500).send({
             err: "Bad Request!"

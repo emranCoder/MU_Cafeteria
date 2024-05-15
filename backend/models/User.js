@@ -61,11 +61,13 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: 'default-avatar.png',
     },
-    verify: {
-        type: String,
-        default: null,
-    }
-    ,
+    orders: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Order',
+            default: null,
+        }
+    ],
     auth: [
         {
             type: Object,

@@ -6,9 +6,10 @@ import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import SearchIcon from "@mui/icons-material/Search";
 import Animation from "../spinner/Animation";
 
-export default function Product() {
+export default function Staffs() {
   const [page, setPage] = useState(2);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [previewFile, setPreviewFIle] = useState(null);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -18,11 +19,12 @@ export default function Product() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
   return (
     <Animation>
       <div className="rounded-xl border shadow-lg p-10 max-sm:px-0 px-5 max-sm:py-5">
         <div className="container overflow-hidden">
-          <div className="product-box ">
+          <div className="staff-box ">
             <div className="head flex justify-between content-center">
               <h3 className="text-2xl font-semibold text-slate-600">Product</h3>
               <label className="input mr-3  w-2/5 max-sm:h-9  h-10 rounded-full  input-bordered input-md flex focus-within:outline-none focus-within:border-sky-800  items-center gap-2">
@@ -49,35 +51,81 @@ export default function Product() {
 
             <dialog id="my_modal_1" className="modal">
               <div className="modal-box">
-                <h3 className="font-bold text-lg">New Product!</h3>
+                <h3 className="font-bold text-lg">New Staff!</h3>
 
                 <div className="modal-action justify-center">
                   <form method="dialog">
                     <input
                       type="text"
                       name="name"
-                      placeholder="Product Name"
+                      placeholder="Staff Name"
                       className="input input-bordered rounded-lg w-full focus:outline-none focus:border-sky-800 focus:ring-sky-500 focus:ring-1oc"
                     />
                     <input
                       type="text"
-                      placeholder="Price"
-                      name="price"
+                      placeholder="Phone Number (01........)"
+                      name="phoneNumber"
                       className="input mt-2 input-bordered rounded-lg w-full focus:outline-none focus:border-sky-800 focus:ring-sky-500 focus:ring-1oc"
                     />
-                    <textarea
-                      type="text"
-                      name="description"
-                      placeholder="Description"
-                      className="rounded-lg h-24 my-2 w-full focus:outline-none focus:border-sky-800 focus:ring-sky-500 focus:ring-1oc textarea textarea-bordered"
-                    />
                     <input
-                      type="file"
-                      name="image"
-                      placeholder="Upload Product Image"
-                      className="file-input w-full file-input-sm  "
+                      type="text"
+                      placeholder="NID No."
+                      name="nidNO"
+                      className="input mt-2 input-bordered rounded-lg w-full focus:outline-none focus:border-sky-800 focus:ring-sky-500 focus:ring-1oc"
                     />
-                    <div className="grid grid-cols-2 gap-1 my-5 mt-10">
+                    <select
+                      className="select select-bordered  input mt-2  rounded-lg w-full focus:outline-none focus:border-sky-800 focus:ring-sky-500 focus:ring-1oc"
+                      defaultValue="1"
+                      name="staffRole"
+                    >
+                      <option disabled value="1">
+                        Choose Staff Role
+                      </option>
+                      <option>Manager</option>
+                      <option>Head. Chef</option>
+                      <option>Assistant Chef</option>
+                      <option>Steward</option>
+                      <option>Cleaner</option>
+                      <option>Guard</option>
+                    </select>
+                    <input
+                      type="text"
+                      placeholder="Salary Amount (in hr/USD)"
+                      name="salaryRate"
+                      className="input mt-2 input-bordered rounded-lg w-full focus:outline-none focus:border-sky-800 focus:ring-sky-500 focus:ring-1oc"
+                    />
+                    <div className="flex justify-between my-2   ">
+                      <label
+                        onClick={() => {
+                          document.getElementById("fileInput").click();
+                        }}
+                        htmlFor="files"
+                        className="btn bg-slate-600 hover:bg-slate-800 text-white mt-2 rounded-lg"
+                      >
+                        Upload Staff Image
+                      </label>
+                      <input
+                        type="file"
+                        name="staffImage"
+                        id="fileInput"
+                        placeholder="Upload Product Image"
+                        className="file-input w-full file-input-sm  hidden"
+                        accept="image/*"
+                        onChange={(e) => {
+                          let fileName = e.target.files[0];
+                          let preview = URL.createObjectURL(fileName);
+                          setPreviewFIle(preview);
+                        }}
+                      />
+                      <div className="avatar mr-5">
+                        <div className="mask mask-squircle w-20 h-20">
+                          {previewFile && (
+                            <img src={previewFile} id="preview" />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-1 my-5 ">
                       <button
                         type="btn"
                         className="rounded-full bg-slate-800 btn hover:bg-slate-700 text-white"
@@ -99,9 +147,9 @@ export default function Product() {
               <thead>
                 <tr className="bg-base-300 text-slate-600 uppercase text-sm">
                   <th>Image</th>
-                  <th className="max-sm:hidden">Description</th>
-                  <th>Price</th>
-                  <th>Offer</th>
+                  <th>Phone Number</th>
+                  <th>Role</th>
+                  <th>Salary Rate</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -123,12 +171,8 @@ export default function Product() {
                       </div>
                     </div>
                   </td>
-                  <td className="w-1/2 max-sm:hidden">
-                    <p className="text-sm opacity-80">
-                      {" "}
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Voluptatem porro quaerat ut beatae quisquam non a?
-                    </p>
+                  <td>
+                    <p className="text-sm opacity-80"> +8801912454411</p>
                   </td>
                   <td>
                     <p>50$</p>
@@ -169,12 +213,8 @@ export default function Product() {
                       </div>
                     </div>
                   </td>
-                  <td className="w-1/2 max-sm:hidden">
-                    <p className="text-sm opacity-80">
-                      {" "}
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Voluptatem porro quaerat ut beatae quisquam non a?
-                    </p>
+                  <td>
+                    <p className="text-sm opacity-80"> +8801912454411</p>
                   </td>
                   <td>
                     <p>50$</p>
@@ -215,12 +255,8 @@ export default function Product() {
                       </div>
                     </div>
                   </td>
-                  <td className="w-1/2 max-sm:hidden">
-                    <p className="text-sm opacity-80">
-                      {" "}
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Voluptatem porro quaerat ut beatae quisquam non a?
-                    </p>
+                  <td>
+                    <p className="text-sm opacity-80"> +8801912454411</p>
                   </td>
                   <td>
                     <p>50$</p>
@@ -261,12 +297,8 @@ export default function Product() {
                       </div>
                     </div>
                   </td>
-                  <td className="w-1/2 max-sm:hidden">
-                    <p className="text-sm opacity-80">
-                      {" "}
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Voluptatem porro quaerat ut beatae quisquam non a?
-                    </p>
+                  <td>
+                    <p className="text-sm opacity-80"> +8801912454411</p>
                   </td>
                   <td>
                     <p>50$</p>

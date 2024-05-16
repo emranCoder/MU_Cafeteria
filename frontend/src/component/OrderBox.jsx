@@ -1,46 +1,26 @@
 import React from "react";
-import FoodItem from "./FoodItem";
-import OrderMenuBox from "./OrderMenuBox";
-import { Grid, Container } from "@mui/material";
-import FooterMenu from "./FooterMenu";
-import { styled } from "@mui/material/styles";
-import Paper from "@mui/material/Paper";
 
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: "center",
-  color: theme.palette.text.secondary,
-  boxShadow: "none",
-}));
+import FoodItem from "./FoodItem";
+
+import FooterMenu from "./FooterMenu";
+import OrderMenuBox from "./OrderMenuBox";
 
 export default function OrderBox() {
   return (
-    <div>
-      <Container className="bg-white rounded-xl p-0" sx={{ flexGrow: 1 }}>
-        <Grid
-          container
-          direction={"row"}
-          justifyContent={"center"}
-          className="mt-5"
-        >
-          {/* <Grid item lg={3} md={3}> */}
-          <Grid item xs={3}>
-            <Item>
+    <section className="order-section py-5">
+      <div className="container">
+        <div className="order-box bg-white max-sm:px-2 rounded-xl p-10 max-sm:p-4">
+          <div className="container-row">
+            <div className="col-lg-12 max-lg:hidden !sticky top-2 mb-5">
               <OrderMenuBox />
-            </Item>
-          </Grid>
-          {/* <Grid item lg={9} md={9}> */}
-          <Grid item xs={9}>
-            <Item>
-              {" "}
+            </div>
+            <div className="col-lg-12 col-md-12 max-w-full max-lg:w-full max-sm:px-4  ">
               <FoodItem />
-            </Item>
-          </Grid>
-        </Grid>
-      </Container>
+            </div>
+          </div>
+        </div>
+      </div>
       <FooterMenu />
-    </div>
+    </section>
   );
 }

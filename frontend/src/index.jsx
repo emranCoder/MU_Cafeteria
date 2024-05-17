@@ -23,8 +23,14 @@ import PaymentStatus from "./Admin/pages/PaymentStatus";
 import Staffs from "./Admin/pages/Staffs";
 import Setting from "./Admin/pages/Setting";
 import Customer from "./Admin/pages/Customer";
-import Login from "./Authentication/Login";
 import ContactUs from "./component/ContactUs";
+import Profile from "./User/Profile";
+import ChangePwd from "./User/ChangePwd";
+import Blog from "./component/Blog";
+import ViewProduct from "./Admin/pages/ViewProduct";
+import Login from "./Authentication/Login";
+import Register from "./Authentication/Register";
+import Credential from "./Authentication/Credential";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -32,6 +38,10 @@ const router = createBrowserRouter(
       <Route element={<App />}>
         <Route path="/" element={<OrderBox />} />
         <Route path="contactus" element={<ContactUs />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="changepwd" element={<ChangePwd />} />
+        <Route path="blog" element={<Blog />} />
       </Route>
       <Route element={<Admin />}>
         <Route path="dashboard" element={<HomeInfo />} />
@@ -43,8 +53,11 @@ const router = createBrowserRouter(
         <Route path="staff" element={<Staffs />} />
         <Route path="setting" element={<Setting />} />
         <Route path="user" element={<Customer />} />
+        <Route path="viewproduct" element={<ViewProduct />} />
       </Route>
       <Route path="/login" element={<Login />} />
+      <Route path="/registration" element={<Register />} />
+      <Route path="/credential" element={<Credential />} />
     </Route>
   )
 );

@@ -27,12 +27,12 @@ const getAllOrder = async (req, res) => {
 
     try {
 
-        const orders = await Order.find().populate('user', 'fName lName');
+        const products = await Order.find();
 
-        if (!orders) {
+        if (!products) {
             return res.status(404).json({ err: "False Attempted!" });
         }
-        res.status(200).json({ order: orders });
+        res.status(200).json({ products: products });
 
     } catch (error) {
 
@@ -43,12 +43,12 @@ const getAllOrder = async (req, res) => {
 const getOrder = async (req, res) => {
 
     try {
-        const order = await Order.findById(req.params.id);
+        const products = await Order.findById(req.params.id);
 
-        if (!order) {
+        if (!products) {
             return res.status(404).json({ err: "False Attempted!" });
         }
-        res.status(200).json({ order: order });
+        res.status(200).json({ products: products });
 
     } catch (error) {
         res.status(500).send({ err: "Bad request!" });
@@ -64,7 +64,7 @@ const updateOrder = async (req, res) => {
                 err: "Server is down!"
             });
         }
-        res.status(200).json({ mess: "You got an update!" });
+        res.status(200).json({ mess: "You got a update!" });
     } catch (error) {
         res.status(500).send({
             err: "Bad request!"

@@ -1,22 +1,41 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as Mui from "@mui/material";
 import TextField from "@mui/material/TextField";
+import Info from "./Info";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { addToast } from "../redux/ToastSlice";
+import Loading from "../component/Loading";
+import { useLocation, useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
-export default function Login() {
+export default function Login(props) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [err, setErr] = useState(null);
+  const [loader, setLoader] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoader(false);
+    }, 500);
+  }, [0]);
+
   const [formData, setFormData] = useState({
-    username: "",
-    password: "",
+    username: "emranalam645@gmail.com",
+    pwd: "Emran@1234",
     rememberMe: false,
   });
 
   const [errors, setErrors] = useState({
     username: "",
-    password: "",
+    pwd: "",
   });
 
   const validateForm = () => {
     let valid = true;
-    const newErrors = { username: "", password: "" };
+    const newErrors = { username: "", pwd: "" };
 
     if (!formData.username) {
       newErrors.username = "Username is required";
@@ -24,10 +43,10 @@ export default function Login() {
     }
 
     // Password strength check
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
-    if (!formData.password || !passwordRegex.test(formData.password)) {
-      newErrors.password =
-        "Password must be at least 6 characters with at least one uppercase and one lowercase letter";
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+    if (!formData.pwd || !passwordRegex.test(formData.pwd)) {
+      newErrors.pwd =
+        "Password must be at least 8 characters with at least one uppercase and one lowercase letter";
       valid = false;
     }
 
@@ -35,13 +54,26 @@ export default function Login() {
     return valid;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (validateForm()) {
-      // Add your login logic here
-      console.log("Login successful");
-    } else {
-      console.log("Login failed");
+      try {
+        let response = await axios.post(
+          `http://localhost:5000/api/login/`,
+          formData
+        );
+
+        if (response && response.status === 200) {
+          const { message, user, token } = response.data;
+          dispatch(addToast({ type: "info", msg: message }));
+          Cookies.set("id", user._id, process.env.REACT_APP_AUTH_EXP);
+          Cookies.set("auth", token, process.env.REACT_APP_AUTH_EXP);
+          window.location.replace("/");
+        }
+      } catch (error) {
+        if (error.response.data.err) {
+          setErr(error.response.data.err);
+        }
+      }
     }
   };
 
@@ -54,30 +86,36 @@ export default function Login() {
   };
 
   return (
-    <div className="container-fluid bg-red-50 h-lvh">
-      <div className="container-row justify-center content-center h-full items-center m-auto">
-        <div className="col-lg-1"></div>
-        <div className="col-lg-5 col-md-9 max-sm:w-full">
+    <div className="container-fluid bg-slate-50 py-10 ">
+      {loader && <Loading />}
+      <div className="container-row justify-center content-center flex-start items-center m-auto">
+        <div className="col-lg-1 max-md:block hidden max-sm:block mt-0">
+          {" "}
+          <h3 className="text-[50px] font-serif font-bold text-slate-800 mb-10 mt-8">
+            OrderNow
+          </h3>
+        </div>
+        <div className="col-lg-5 col-md-9 max-sm:w-full mb-10">
           <div className="login-form bg-base-100 max-sm:p-10  p-16 border rounded-xl shadow-lg  ">
-            <h3 className="text-3xl font-semibold text-slate-600">Login</h3>
+            <h3 className="text-3xl font-semibold text-slate-800 ">Login</h3>
             <p className="my-2 text-slate-500">
               Don't have an account?
-              <a
-                href="#"
-                className="font-semibold text-red-600 hover:text-slate-600"
+              <Link
+                to="/credential"
+                className="font-semibold text-slate-600 hover:text-slate-800 hover:underline"
               >
                 {" "}
                 Register
-              </a>
+              </Link>
             </p>
             <form
-              onSubmit={handleSubmit}
+              onSubmit={(event) => event.preventDefault()}
               className="flex items-center flex-col mt-5"
             >
               <TextField
                 fullWidth
-                className="!border-sky-700 "
-                label="Username"
+                className="!border-slate-700 "
+                label="Email"
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
@@ -97,12 +135,12 @@ export default function Login() {
                     paddingBottom: "10px",
                   },
                   "& .Mui-focused": {
-                    color: "rgb(71,85,105)",
+                    color: "rgb(2 132 199) !important",
                   },
 
                   "& .MuiOutlinedInput-root": {
                     "&.Mui-focused fieldset": {
-                      borderColor: "rgb(71,85,105)",
+                      borderColor: "rgb(2 132 199)",
                     },
                   },
                 }}
@@ -111,11 +149,11 @@ export default function Login() {
                 fullWidth
                 type="password"
                 label="Password"
-                name="password"
-                value={formData.password}
+                name="pwd"
+                value={formData.pwd}
                 onChange={handleChange}
-                error={Boolean(errors.password)}
-                helperText={errors.password}
+                error={Boolean(errors.pwd)}
+                helperText={errors.pwd}
                 margin="normal"
                 sx={{
                   "& legend": { display: "none" },
@@ -130,12 +168,12 @@ export default function Login() {
                     paddingBottom: "10px",
                   },
                   "& .Mui-focused": {
-                    color: "rgb(71,85,105)",
+                    color: "rgb(2 132 199) !important",
                   },
 
                   "& .MuiOutlinedInput-root": {
                     "&.Mui-focused fieldset": {
-                      borderColor: "rgb(71,85,105)",
+                      borderColor: "rgb(2 132 199)",
                     },
                   },
                 }}
@@ -150,8 +188,11 @@ export default function Login() {
                 </label>
               </div>
               <button
+                onClick={() => {
+                  handleSubmit();
+                }}
                 type="btn"
-                className="mt-5 rounded-full p-0 font-semibold w-full  bg-red-600 btn hover:bg-red-500 text-slate-100 overflow-hidden"
+                className="mt-5 rounded-full p-0 font-semibold w-full  bg-slate-700 btn hover:bg-slate-600 text-slate-100 overflow-hidden"
               >
                 <Mui.ListItemButton
                   className="!flex !justify-center"
@@ -168,7 +209,7 @@ export default function Login() {
               <label className="label mt-3">
                 <a
                   href="#"
-                  className="label-text-alt link link-hover hover:!text-red-600"
+                  className="label-text-alt link link-hover hover:!text-slate-800"
                 >
                   Forgot password?
                 </a>
@@ -176,16 +217,8 @@ export default function Login() {
             </form>
           </div>
         </div>
-        <div className="col-lg-6">
-          <div className="lg:block hidden p-16 dtl-login">
-            <h3 className="text-[50px] font-bold text-slate-600">OrderNow</h3>
-            <p className="p-2 text-slate-600">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-              Distinctio adipisci eveniet, sunt officia praesentium maiores
-              suscipit, iure unde consequatur, esse et laborum! Sed et
-              architecto, totam eum tempore nemo odit?
-            </p>
-          </div>
+        <div className="col-lg-6  col-sm-6 ">
+          <Info />
         </div>
       </div>
     </div>

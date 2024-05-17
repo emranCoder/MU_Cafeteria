@@ -1,35 +1,21 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
-const { hashedPwd } = require('../config/utility');
+const { hashedPwd, generateOTP, checkPwd } = require('../config/utility');
 const path = require('path');
 
 
 const addUser = async (req, res) => {
     try {
-        let uData;
+        ;
         const encPwd = await hashedPwd(req.body.pwd);
-
-        if (req.files && req.files.length > 0) {
-            uData = {
-                ...req.body,
-                avatar: req.files[0].filename,
-                pwd: encPwd,
-            }
-        } else {
-            uData = {
-                ...req.body,
-                pwd: encPwd,
-            }
-        }
+        const uData = { ...req.body, pwd: encPwd, }
 
         const newUser = new User(uData);
         const addUser = await newUser.save();
         if (!addUser) { return res.res.status(500).send({ err: "Unable to add user!" }); }
 
-        const token = jwt.sign({ token: addUser._id }, process.env.JWT_SECRETS, { expiresIn: '2h' });
-
-        res.status(200).json({ message: "User added Successfully!", user: token });
+        res.status(200).json({ message: "Welcome! Login to continue." });
     } catch (error) {
         res.status(500).send({
             err: "Bad request!"
@@ -37,15 +23,30 @@ const addUser = async (req, res) => {
     }
 }
 
+
+const getAllUser = async (req, res) => {
+    try {
+        let user = await User.find().select('-pwd -__v -auth');
+
+        if (!user) {
+            return res.status(404).json({ err: "Server is Down!" });
+        }
+        res.status(200).json({ user: user });
+    } catch (error) {
+        res.status(500).send({
+            err: "Bad request!"
+        });
+    }
+}
+
+
+
 const getUser = async (req, res) => {
     try {
-        const queryId = req.params.id;
-        let user;
-        if (queryId === "auth") {
-            user = await User.findById(req.uID).select('-pwd -__v -auth');
-        } else {
-            user = await User.findById(queryId).select('-pwd -__v -auth');
-        }
+        const queryId = (req.headers.id) ? req.headers.id : req.uID;
+
+        const user = await User.findById(queryId).select('-pwd -__v -auth');
+
         if (!user) {
             return res.status(404).json({ err: "False Attempted!" });
         }
@@ -59,16 +60,52 @@ const getUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
     try {
-        const { id, ...bodyData } = { ...req.body };
+        const { id, oldImg, currentPwd, conPwd, ...bodyData } = { ...req.body };
+        let newData = bodyData;
 
-        const user = await User.findByIdAndUpdate(id, bodyData);
+        const userImg = await User.findById(id).select('avatar pwd username');
+        if (!userImg) {
+            return res.status(500).send({
+                err: "Server is down!"
+            });
+        }
+
+
+        if (currentPwd && conPwd && bodyData.pwd) {
+            if (!(conPwd === newData.pwd)) return res.status(404).send({ mess: "Passwords do NOT match!" });
+            if (currentPwd === newData.pwd) return res.status(404).send({ mess: "Current Password & new password are same!" });
+
+            const encPwd = await hashedPwd(bodyData.pwd);
+            newData = { pwd: encPwd }
+
+            const value = userImg.username + "_" + id;
+            const token = await checkPwd(currentPwd, userImg.pwd, value);
+
+            if (!token) return res.status(404).send({ mess: "Passwords do NOT match!" });
+        }
+
+        if (req.files && req.files.length > 0) {
+
+            const fileName = oldImg;
+            if (!(fileName === "default-product.png") && !(req.files[0].filename === userImg.avatar)) {
+                const fileDest = '../public/uploads/avatars/';
+
+                fs.unlink(path.join(__dirname, fileDest + fileName), (err) => {
+
+                });
+            }
+            newData = { ...bodyData, avatar: req.files[0].filename, };
+        }
+
+        const user = await User.findByIdAndUpdate(id, newData).select('-pwd -__v -auth');
         if (!user) {
             return res.status(500).send({
                 err: "Server is down!"
             });
         }
-        res.status(200).json({ mess: "You got a update!" });
+        res.status(200).json({ message: "Update Successfully!", user: user });
     } catch (error) {
+
         res.status(500).send({
             err: "Bad request!"
         });
@@ -77,6 +114,7 @@ const updateUser = async (req, res) => {
 
 const removeUser = async (req, res) => {
     try {
+        if (!(req.uRole === "admin")) return res.status(500).send({ err: "Server is down!" });
         const id = req.body.id;
         const user = await User.findByIdAndDelete(id).select('avatar -_id');
         if (!user) {
@@ -94,7 +132,7 @@ const removeUser = async (req, res) => {
                 }
             });
         }
-        res.status(200).json({ mess: "Deleted Successfully!" });
+        res.status(200).json({ message: "Deleted Successfully!" });
     } catch (error) {
         res.status(500).send({
             err: "Bad Request!"
@@ -105,4 +143,4 @@ const removeUser = async (req, res) => {
 
 
 
-module.exports = { addUser, getUser, updateUser, removeUser };
+module.exports = { addUser, getUser, updateUser, removeUser, getAllUser };

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import SellIcon from "@mui/icons-material/Sell";
 import SegmentIcon from "@mui/icons-material/Segment";
@@ -8,11 +8,79 @@ import BarChart from "../chart/BarChart";
 import PieChart from "../chart/PieChart";
 import Animation from "../spinner/Animation";
 import { NavLink } from "react-router-dom";
-
-const pieData = [25, 5, 8];
-const barData = [44, 55, 41, 67, 22, 43, 21, 33, 45, 31, 87, 65];
+import axios from "axios";
+import Cookies from "js-cookie";
+import { Link } from "react-router-dom";
 
 export default function HomeInfo() {
+  useEffect(() => {
+    getProductFrequency();
+    getOrderFrequency();
+    getUserFrequency();
+  }, []);
+
+  const [productFrequency, setProductFrequency] = useState(0);
+  const [orderFrequency, setOrderFrequency] = useState(0);
+  const [userFrequency, setUserFrequency] = useState(0);
+  const [income, setIncome] = useState(0);
+  const pieData = [
+    productFrequency,
+    userFrequency,
+    (orderFrequency && orderFrequency.length) || 0,
+  ];
+  const barData = [44, 55, 41, 67, 22, 43, 21, 33, 45, 31, 87, 65];
+
+  const getProductFrequency = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/product/all`,
+        {
+          headers: {
+            token: Cookies.get("auth"),
+          },
+        }
+      );
+      if (response && response.status === 200) {
+        setProductFrequency(response.data.products.length);
+      }
+    } catch (error) {
+      if (error) console.log(error.response.data);
+    }
+  };
+  const getOrderFrequency = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/order/all`, {
+        headers: {
+          token: Cookies.get("auth"),
+        },
+      });
+      if (response && response.status === 200) {
+        response.data.order.sort(
+          (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
+        );
+        setOrderFrequency(response.data.order);
+        setIncome(response.data.total);
+      }
+    } catch (error) {
+      if (error && error.response) console.log(error.response.data);
+    }
+  };
+  const getUserFrequency = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/auth/getuser`,
+        {
+          headers: {
+            token: Cookies.get("auth"),
+          },
+        }
+      );
+      if (response && response.status === 200) {
+        setUserFrequency(response.data.user.length);
+      }
+    } catch (error) {}
+  };
+
   return (
     <div className="container-fluid p-0 m-0">
       <Animation>
@@ -27,7 +95,7 @@ export default function HomeInfo() {
                         Income
                       </p>
                       <h3 className="text-4xl font-bold leading-loose text-white">
-                        $24k
+                        ${income}
                       </h3>
                     </div>
                     <h3 className="icon">
@@ -44,7 +112,7 @@ export default function HomeInfo() {
                         Orders
                       </p>
                       <h3 className="text-4xl font-bold leading-loose text-white">
-                        ! 200
+                        ! {orderFrequency.length}
                       </h3>
                     </div>
                     <h3 className="icon">
@@ -61,7 +129,7 @@ export default function HomeInfo() {
                         Products
                       </p>
                       <h3 className="text-4xl font-bold leading-loose text-white">
-                        # 100
+                        # {productFrequency}
                       </h3>
                     </div>
                     <h3 className="icon">
@@ -78,7 +146,7 @@ export default function HomeInfo() {
                         Users
                       </p>
                       <h3 className="text-4xl font-bold leading-loose text-white">
-                        1K
+                        {userFrequency}
                       </h3>
                     </div>
                     <h3 className="icon">
@@ -296,39 +364,51 @@ export default function HomeInfo() {
                         </tr>
                       </thead>
                       <tbody>
-                        {/* row 1 */}
-                        <tr className="hover">
-                          <td>Cy Ganderton</td>
-                          <td>Quality Control Specialist</td>
-                          <td>Blue</td>
-                          <td>
-                            <span className="uppercase px-3 py-1 text-orange-800 font-medium text-xs bg-opacity-30 bg-orange-200 rounded-full">
-                              pending
-                            </span>
-                          </td>
-                        </tr>
-                        {/* row 2 */}
-                        <tr className="hover">
-                          <td>Hart Hagerty</td>
-                          <td>Desktop Support Technician</td>
-                          <td>Purple</td>
-                          <td>
-                            <span className="uppercase px-3 py-1 text-green-800 font-medium text-xs bg-opacity-40 bg-green-200 rounded-full">
-                              Delivered
-                            </span>
-                          </td>
-                        </tr>
-                        {/* row 3 */}
-                        <tr className="hover">
-                          <td>Brice Swyre</td>
-                          <td>Tax Accountant</td>
-                          <td>Red</td>
-                          <td>
-                            <span className="uppercase px-3 py-1 text-red-800 font-medium text-xs bg-opacity-40 bg-red-200 rounded-full">
-                              refunded
-                            </span>
-                          </td>
-                        </tr>
+                        {orderFrequency &&
+                          orderFrequency.slice(0, 4).map((val, key) => (
+                            <tr key={key} className="hover">
+                              <td>{val.orderNumber}</td>
+                              <td className="hover:text-sky-900 ">
+                                <Link to="/view" state={val.user._id}>
+                                  {val.user &&
+                                    val.user.fName + " " + val.user.lName}
+                                </Link>
+                              </td>
+                              <td>
+                                <span className="text-slate-500">
+                                  {new Date(val.orderDate).toLocaleDateString(
+                                    "en-GB",
+                                    {
+                                      day: "numeric",
+                                      month: "short",
+                                      year: "numeric",
+                                    }
+                                  )}
+                                </span>
+                                {", " +
+                                  new Date(val.orderDate).toLocaleTimeString(
+                                    "en-us",
+                                    {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    }
+                                  )}
+                              </td>
+                              <td>
+                                <span
+                                  className={`uppercase px-3 py-1  font-medium text-xs bg-opacity-30  rounded-full ${
+                                    val.orderStatus === "Pending"
+                                      ? "text-orange-800 bg-orange-200"
+                                      : val.orderStatus === "Refunded"
+                                      ? "text-red-800 bg-red-200"
+                                      : "text-green-800 bg-green-200"
+                                  }`}
+                                >
+                                  {val.orderStatus}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
                       </tbody>
                     </table>
                   </div>

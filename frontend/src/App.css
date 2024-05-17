@@ -647,6 +647,21 @@ body {
     color: rgb(255, 255, 255);
 }
 
+.navbar-ul li {
+    color: rgb(71, 85, 105);
+    padding: 0px 10px;
+}
+
+.navbar-ul li:hover {
+    color: rgb(220, 38, 38) !important;
+    transition: 0.5s;
+
+}
+
+.navbar-ul .active>li {
+    color: rgb(220, 38, 38);
+}
+
 .box-right {
     position: fixed;
     overflow-y: auto;
@@ -658,6 +673,7 @@ body {
 .MuiBadge-badge {
     background-color: #b45309 !important;
 }
+
 
 /***** End Universal Class *****/
 
@@ -743,6 +759,9 @@ body {
     margin: 2px;
 }
 
-.footer-box {
-    box-shadow: 0 5px 15px #333;
+.menu li> :not(ul, .menu-title, details, .btn):active,
+.menu li> :not(ul, .menu-title, details, .btn).active,
+.menu li>details>summary:active {
+    background-color: #dc2626 !important;
+    color: white !important;
 }

@@ -1,14 +1,15 @@
-import * as React from "react";
+import React from "react";
 import "./App.css";
 import NavBar from "./component/NavBar";
-import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
+import Footer from "./component/Footer";
 
 function App() {
   return (
-    <div className="bg-cafe-100 h-screen" sx={{ flexGrow: 1 }}>
+    <div className="bg-gray-100 ">
       <NavBar />
       <Outlet />
+      <Footer />
     </div>
   );
 }

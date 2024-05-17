@@ -1,25 +1,27 @@
-import React from "react";
-import * as Mui from "@mui/material";
+import React, { useEffect } from "react";
 import FoodItem from "./FoodItem";
-import OrderMenuBox from "./OrderMenuBox";
 import FooterMenu from "./FooterMenu";
+import OrderMenuBox from "./OrderMenuBox";
 
 export default function OrderBox() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
-    <section className="order-section">
+    <section className="order-section py-5">
       <div className="container">
-        <div className="order-box bg-white p-10 my-10">
+        <div className="order-box bg-white max-sm:px-2 rounded-xl p-10 max-sm:p-4">
           <div className="container-row">
-            <div className="col-lg-3 max-md:hidden">
+            <div className="col-lg-12 max-lg:hidden !sticky top-2 mb-5">
               <OrderMenuBox />
             </div>
-            <div className="col-lg-9 col-md-9">
+            <div className="col-lg-12 col-md-12 max-w-full max-lg:w-full max-sm:px-4  ">
               <FoodItem />
             </div>
           </div>
         </div>
       </div>
-
       <FooterMenu />
     </section>
   );

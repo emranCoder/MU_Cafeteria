@@ -62,7 +62,7 @@ export default function ContactUs() {
                 <input
                   type="email"
                   placeholder="Email.."
-                  className="input input-bordered w-full input-md text-slate-700 focus-within:border-red-500 focus-within:outline-none 
+                  className="input input-bordered w-full input-md text-slate-700 focus-within:border-slate-500 focus-within:outline-none 
                   bg-gray-50"
                   required
                 />
@@ -78,7 +78,7 @@ export default function ContactUs() {
                 <input
                   type="text"
                   placeholder="Subject..."
-                  className="input input-bordered w-full input-md text-slate-700 focus-within:border-red-500 focus-within:outline-none 
+                  className="input input-bordered w-full input-md text-slate-700 focus-within:border-slate-500 focus-within:outline-none 
                   bg-gray-50"
                   required
                 />
@@ -91,13 +91,14 @@ export default function ContactUs() {
                   Your message
                 </label>
                 <textarea
-                  className="textarea textarea-bordered w-full text-slate-700 focus-within:border-red-500 !outline-none bg-gray-50"
+                  className="textarea textarea-bordered w-full text-slate-700 focus-within:border-slate-500 !outline-none bg-gray-50"
+                  rows={3}
                   placeholder="Leave Comment.."
                 ></textarea>
               </div>
               <button
                 type="submit"
-                className="btn  min-h-full  h-full py-3 px-5 rounded-full border-red-600 bg-transparent hover:bg-red-500 hover:text-white text-red-500"
+                className="btn mt-5  min-h-full  h-full py-3 px-5 rounded-full border-slate-600 bg-transparent hover:bg-slate-500 hover:text-white text-slate-500"
               >
                 Send message
               </button>

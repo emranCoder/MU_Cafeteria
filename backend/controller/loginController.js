@@ -6,14 +6,17 @@ const login = async (req, res) => {
 
     try {
         const { username, pwd } = { ...req.body };
+        const user = await User.findOne({
+            $or: [{ username: username }, { mobile: username }, { email: username }]
+        }).select('pwd auth fName avatar');
 
-        const user = await User.findOne({ $or: [{ username: username }, { mobile: username }, { email: username }] }).select('pwd auth');
         if (!user) {
             return res.status(404).send({
                 err: "Please try to login with your username & password!",
             });
         }
         const userPwd = user.pwd;
+        const userFname = user.fName;
         const userId = user._id;
         const value = username + "_" + userId;
         const token = await checkPwd(pwd, userPwd, value);
@@ -36,8 +39,13 @@ const login = async (req, res) => {
                 err: "Authentication failed!",
             });
         }
-        res.status(200).json({ token: authToken.token, id: userId });
+        const userData = await User.findOne({
+            $or: [{ username: username }, { mobile: username }, { email: username }]
+        }).select('-pwd -_v');
+
+        res.status(200).json({ message: `Hi! ${userFname}`, token: authToken.token, user: userData });
     } catch (error) {
+        console.log(error)
         res.status(500).send({
             err: "Bad request!"
         });
@@ -47,7 +55,7 @@ const login = async (req, res) => {
 const logout = async (req, res, next) => {
 
     try {
-        const qId = req.body.id;
+        const qId = req.uID;
         if (!(req.uID === qId)) {
             return res.status(404).send({
                 err: "False Attempted!"

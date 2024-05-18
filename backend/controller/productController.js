@@ -1,11 +1,14 @@
 const Product = require('../models/Product');
+
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const { hashedPwd } = require('../config/utility');
 const path = require('path');
+const Category = require('../models/Category');
 
 const addProduct = async (req, res) => {
     try {
+        if (!(req.uRole === "admin")) return res.status(500).send({ err: "Server is down!" });
         let productData = req.body;
 
         if (req.files && req.files.length > 0) {
@@ -16,7 +19,25 @@ const addProduct = async (req, res) => {
         }
         const newProduct = new Product(productData);
         const addProduct = await newProduct.save();
-        if (!addProduct) { return res.res.status(500).send({ err: "Unable to add product!" }); }
+        const category = await Category.findOneAndUpdate({ name: addProduct.category }, { $push: { products: addProduct._id } });
+        if (!addProduct) { return res.res.status(404).send({ err: "Unable to add product!" }); }
+        if (!category) {
+            const product = await Product.findByIdAndDelete(id).select('image -_id');
+            if (!product) {
+                return res.status(500).send({
+                    err: "Server is down!"
+                });
+            }
+            const fileName = product.image;
+            if (!(fileName === "default-product.png")) {
+                const fileDest = '../public/uploads/products/';
+
+                fs.unlink(path.join(__dirname, fileDest + fileName), (err) => {
+
+                });
+            }
+            return res.res.status(404).send({ err: "Unable to add product!" });
+        }
 
         res.status(200).json({ message: "Product added Successfully!", id: addProduct._id });
     } catch (error) {
@@ -52,7 +73,7 @@ const getProduct = async (req, res) => {
         if (!products) {
             return res.status(404).json({ err: "False Attempted!" });
         }
-        res.status(200).json({ products: products });
+        res.status(200).json({ product: products });
 
     } catch (error) {
         res.status(500).send({ err: "Bad request!" });
@@ -60,16 +81,40 @@ const getProduct = async (req, res) => {
 }
 const updateProduct = async (req, res) => {
     try {
-        const { id, ...bodyData } = { ...req.body };
+        if (!(req.uRole === "admin")) return res.status(500).send({ err: "Server is down!" });
+        const { id, oldImg, ...bodyData } = { ...req.body };
 
-        const product = await Product.findByIdAndUpdate(id, bodyData);
+        let newData = bodyData;
+        const productImg = await Product.findById(id).select("image");
+        if (!productImg) {
+            return res.status(500).send({
+                err: "Server is down!"
+            });
+        }
+
+        if (req.files && req.files.length > 0) {
+
+            const fileName = oldImg;
+            if (!(fileName === "default-product.png") && !(fileName === productImg.image)) {
+                const fileDest = '../public/uploads/products/';
+
+                fs.unlink(path.join(__dirname, fileDest + fileName), (err) => {
+
+                });
+            }
+            newData = { ...bodyData, image: req.files[0].filename, };
+        }
+
+        const product = await Product.findByIdAndUpdate(id, newData);
+
         if (!product) {
             return res.status(500).send({
                 err: "Server is down!"
             });
         }
-        res.status(200).json({ message: "You got a update!" });
+        res.status(200).json({ message: "You got an update!", data: product });
     } catch (error) {
+        console.log(error)
         res.status(500).send({
             err: "Bad request!"
         });
@@ -77,6 +122,7 @@ const updateProduct = async (req, res) => {
 }
 const removeProduct = async (req, res) => {
     try {
+        if (!(req.uRole === "admin")) return res.status(500).send({ err: "Server is down!" });
         const id = req.body.id;
         const product = await Product.findByIdAndDelete(id).select('image -_id');
         if (!product) {

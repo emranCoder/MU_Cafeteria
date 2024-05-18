@@ -3,11 +3,15 @@ const mongoose = require('mongoose');
 const orderSchema = new mongoose.Schema({
     products: [
         {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Product',
+            type: String,
             required: true,
         },
     ],
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: null,
+    },
     orderNumber: {
         type: String,
         default: null,
@@ -16,9 +20,17 @@ const orderSchema = new mongoose.Schema({
         type: String,
         default: null,
     },
-    paymentMethod: {
+    discount: {
         type: String,
         default: null,
+    },
+    paymentMethod: {
+        type: String,
+        default: "cash",
+    },
+    orderStatus: {
+        type: String,
+        default: "Pending"
     },
     paymentStatus: {
         type: Boolean,

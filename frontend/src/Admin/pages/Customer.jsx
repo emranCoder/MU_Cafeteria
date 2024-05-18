@@ -1,14 +1,43 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as Mui from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import SearchIcon from "@mui/icons-material/Search";
 import Animation from "../spinner/Animation";
-
+import axios from "axios";
+import { Link } from "react-router-dom";
+import Cookies from "js-cookie";
 export default function Customer() {
   const [page, setPage] = useState(2);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [success, setSuccess] = useState(null);
+  const [customer, setCustomer] = useState(null);
+  const [err, setErr] = useState(null);
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    getCustomer();
+  }, [success]);
+
+  const getCustomer = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/auth/getuser`,
+        {
+          headers: {
+            token: Cookies.get("auth"),
+          },
+        }
+      );
+      if (response && response.status === 200) {
+        setCustomer(response.data.user);
+      }
+    } catch (error) {
+      if (error.response.data.err) {
+        setErr(error.response.data.err);
+      }
+    }
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -18,6 +47,15 @@ export default function Customer() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+  const handleSearch = (e) => {
+    if (e.key === "Backspace" && !e.target.value.trim().length) {
+      setSearch("");
+    }
+    if (e.target.value.trim().length) {
+      setSearch(e.target.value.trim());
+    }
+  };
+
   return (
     <Animation>
       <div className="rounded-xl border shadow-lg p-10 max-sm:px-0 px-5 max-sm:py-5 mb-20">
@@ -32,6 +70,7 @@ export default function Customer() {
                   type="text"
                   className="grow max-sm:w-0 "
                   placeholder="Search"
+                  onKeyUpCapture={handleSearch}
                 />
                 <SearchIcon sx={{ fontSize: 20 }} />
               </label>
@@ -51,156 +90,61 @@ export default function Customer() {
               </thead>
               <tbody>
                 {/* row 1 */}
-                <tr>
-                  <td>
-                    <div className="flex items-center gap-3">
-                      <div className="avatar">
-                        <div className="mask mask-squircle w-12 h-12">
-                          <img
-                            src="https://daisyui.com/tailwind-css-component-profile-2@56w.png"
-                            alt="Avatar Tailwind CSS Component"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <div className="font-bold">Hart Hagerty</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <p className="text-sm opacity-80"> mail@example.com</p>
-                  </td>
-                  <td>
-                    <p>50$</p>
-                  </td>
-                  <td>+8801....</td>
-                  <td className="flex gap-3">
-                    <button className="btn btn-sm btn-success text-white btn-circle flex just-center overflow-  content-center !items-center overflow-hidden">
-                      <Mui.ListItemButton className="!flex !justify-center !items-center">
-                        <EditIcon sx={{ fontSize: 18 }} />
-                      </Mui.ListItemButton>
-                    </button>
-                    <button className="btn btn-sm btn-error text-white btn-circle flex just-center overflow-  content-center !items-center overflow-hidden">
-                      <Mui.ListItemButton className="!flex !justify-center !items-center">
-                        <HighlightOffIcon sx={{ fontSize: 18 }} />
-                      </Mui.ListItemButton>
-                    </button>
-                  </td>
-                </tr>
-                {/* row 2 */}
-                <tr>
-                  <td>
-                    <div className="flex items-center gap-3">
-                      <div className="avatar">
-                        <div className="mask mask-squircle w-12 h-12">
-                          <img
-                            src="https://daisyui.com/tailwind-css-component-profile-3@56w.png"
-                            alt="Avatar Tailwind CSS Component"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <div className="font-bold">Brice Swyre</div>
-                        <div className="text-sm opacity-50">China</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <p className="text-sm opacity-80"> mail@example.com</p>
-                  </td>
-                  <td>
-                    <p>50$</p>
-                  </td>
-                  <td>+88019.....</td>
-                  <td className="flex gap-3">
-                    <button className="btn btn-sm btn-success text-white btn-circle flex just-center overflow-  content-center !items-center overflow-hidden">
-                      <Mui.ListItemButton className="!flex !justify-center !items-center">
-                        <EditIcon sx={{ fontSize: 18 }} />
-                      </Mui.ListItemButton>
-                    </button>
-                    <button className="btn btn-sm btn-error text-white btn-circle flex just-center overflow-  content-center !items-center overflow-hidden">
-                      <Mui.ListItemButton className="!flex !justify-center !items-center">
-                        <HighlightOffIcon sx={{ fontSize: 18 }} />
-                      </Mui.ListItemButton>
-                    </button>
-                  </td>
-                </tr>
-                {/* row 3 */}
-                <tr>
-                  <td>
-                    <div className="flex items-center gap-3">
-                      <div className="avatar">
-                        <div className="mask mask-squircle w-12 h-12">
-                          <img
-                            src="https://daisyui.com/tailwind-css-component-profile-4@56w.png"
-                            alt="Avatar Tailwind CSS Component"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <div className="font-bold">Marjy Ferencz</div>
-                        <div className="text-sm opacity-50">Russia</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <p className="text-sm opacity-80"> mail@example.com</p>
-                  </td>
-                  <td>
-                    <p>50$</p>
-                  </td>
-                  <td>+88.012...</td>
-                  <td className="flex gap-3">
-                    <button className="btn btn-sm btn-success text-white btn-circle flex just-center overflow-  content-center !items-center overflow-hidden">
-                      <Mui.ListItemButton className="!flex !justify-center !items-center">
-                        <EditIcon sx={{ fontSize: 18 }} />
-                      </Mui.ListItemButton>
-                    </button>
-                    <button className="btn btn-sm btn-error text-white btn-circle flex just-center overflow-  content-center !items-center overflow-hidden">
-                      <Mui.ListItemButton className="!flex !justify-center !items-center">
-                        <HighlightOffIcon sx={{ fontSize: 18 }} />
-                      </Mui.ListItemButton>
-                    </button>
-                  </td>
-                </tr>
-                {/* row 4 */}
-                <tr>
-                  <td>
-                    <div className="flex items-center gap-3">
-                      <div className="avatar">
-                        <div className="mask mask-squircle w-12 h-12">
-                          <img
-                            src="https://daisyui.com/tailwind-css-component-profile-5@56w.png"
-                            alt="Avatar Tailwind CSS Component"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <div className="font-bold">Yancy Tear</div>
-                        <div className="text-sm opacity-50">Brazil</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <p className="text-sm opacity-80"> mail@example.com</p>
-                  </td>
-                  <td>
-                    <p>50$</p>
-                  </td>
-                  <td>+88.12</td>
-                  <td className="flex gap-3">
-                    <button className="btn btn-sm btn-success text-white btn-circle flex just-center overflow-  content-center !items-center overflow-hidden">
-                      <Mui.ListItemButton className="!flex !justify-center !items-center">
-                        <EditIcon sx={{ fontSize: 18 }} />
-                      </Mui.ListItemButton>
-                    </button>
-                    <button className="btn btn-sm btn-error text-white btn-circle flex just-center overflow-  content-center !items-center overflow-hidden">
-                      <Mui.ListItemButton className="!flex !justify-center !items-center">
-                        <HighlightOffIcon sx={{ fontSize: 18 }} />
-                      </Mui.ListItemButton>
-                    </button>
-                  </td>
-                </tr>
+                {customer &&
+                  customer
+                    .filter((item) => {
+                      return search.toLowerCase() === ""
+                        ? item
+                        : item._id.toLowerCase().includes(search) ||
+                            item.fName.toLowerCase().includes(search) ||
+                            item.lName.toLowerCase().includes(search) ||
+                            item.email.toLowerCase().includes(search) ||
+                            item.mobile.toLowerCase().includes(search);
+                    })
+                    .map((val, key) => (
+                      <tr key={key}>
+                        <td>
+                          <div className="flex items-center gap-3">
+                            <div className="avatar">
+                              <div className="mask mask-squircle w-12 h-12">
+                                <img
+                                  src={`http://localhost:5000/avatar/${val.avatar}`}
+                                  alt="Avatar Tailwind CSS Component"
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <Link to="/view" state={val._id}>
+                                <div className="font-bold">
+                                  {val.fName + " " + val.lName}
+                                </div>
+                              </Link>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <p className="text-sm opacity-80"> {val.email}</p>
+                        </td>
+                        <td>
+                          <p>{val.mobile}</p>
+                        </td>
+                        <td>{val.addr}</td>
+                        <td className="flex gap-3">
+                          <Link to="/view" state={val._id}>
+                            <button className="btn btn-sm btn-success text-white btn-circle flex just-center overflow-  content-center !items-center overflow-hidden">
+                              <Mui.ListItemButton className="!flex !justify-center !items-center">
+                                <VisibilityIcon sx={{ fontSize: 18 }} />
+                              </Mui.ListItemButton>
+                            </button>
+                          </Link>
+                          <button className="btn btn-sm btn-error text-white btn-circle flex just-center overflow-  content-center !items-center overflow-hidden">
+                            <Mui.ListItemButton className="!flex !justify-center !items-center">
+                              <HighlightOffIcon sx={{ fontSize: 18 }} />
+                            </Mui.ListItemButton>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
               </tbody>
               {/* foot */}
             </table>

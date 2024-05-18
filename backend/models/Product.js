@@ -16,6 +16,7 @@ const productSchema = new mongoose.Schema({
     },
     discount: {
         type: Number,
+        default: 0,
     },
     category: {
         type: String,
@@ -24,6 +25,10 @@ const productSchema = new mongoose.Schema({
     wishlist: {
         type: Boolean,
         default: false,
+    },
+    stock: {
+        type: Boolean,
+        default: true,
     },
     comments: [
         {

@@ -7,6 +7,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import Toast from "../Alert/Toast";
 import Animation from "../spinner/Animation";
 import axios from "axios";
+import { Link } from "react-router-dom";
+import Cookies from "js-cookie";
 
 export default function Product() {
   const [page, setPage] = useState(2);
@@ -16,6 +18,9 @@ export default function Product() {
   const [product, setProduct] = useState(null);
   const [previewFile, setPreviewFIle] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [inputErr, setInputErr] = useState(null);
+  const [search, setSearch] = useState("");
+  const token = Cookies.get("auth");
 
   const closeBtn = useRef(null);
 
@@ -43,11 +48,12 @@ export default function Product() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/product/",
+        `http://localhost:5000/api/product/`,
         productUpload,
         {
           headers: {
             "Content-Type": "multipart/form-data",
+            token: Cookies.get("auth"),
           },
         }
       );
@@ -57,15 +63,20 @@ export default function Product() {
         closeBtn.current.click();
       }
     } catch (error) {
-      if (error.message === "Network Error")
-        return console.error(error.message);
-      console.log(error.response.data.message);
+      if (error.response.data.err) {
+        setInputErr(error.response.data.err);
+      }
     }
   };
   const getCategory = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/category/all"
+        `http://localhost:5000/api/category/all`,
+        {
+          headers: {
+            token: Cookies.get("auth"),
+          },
+        }
       );
       if (response && response.status === 200) {
         setCategory(response.data.category);
@@ -79,7 +90,7 @@ export default function Product() {
 
   const getProduct = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/product/all");
+      const response = await axios.get(`http://localhost:5000/api/product/all`);
       if (response && response.status === 200) {
         setProduct(response.data.products);
       }
@@ -93,7 +104,14 @@ export default function Product() {
   const handleDelete = async (delId) => {
     let id = { id: delId };
     const response = await axios
-      .delete("http://localhost:5000/api/product/", { data: id })
+      .delete(`http://localhost:5000/api/product/`, {
+        headers: {
+          "Content-Type": "application/json",
+          token: Cookies.get("auth"),
+        },
+
+        data: id,
+      })
       .catch((error) => console.error(error.response.data.err));
     if (response && response.status === 200) {
       setSuccess({ type: "del", msg: response.data.message });
@@ -101,6 +119,15 @@ export default function Product() {
   };
   const handleSuccess = () => {
     setSuccess(null);
+  };
+
+  const handleSearch = (e) => {
+    if (e.key === "Backspace" && !e.target.value.trim().length) {
+      setSearch("");
+    }
+    if (e.target.value.trim().length) {
+      setSearch(e.target.value.trim());
+    }
   };
 
   return (
@@ -118,12 +145,13 @@ export default function Product() {
                   type="text"
                   className="grow max-sm:w-0 "
                   placeholder="Search"
+                  onKeyUpCapture={handleSearch}
                 />
                 <SearchIcon sx={{ fontSize: 20 }} />
               </label>
-              <div className="tooltip" data-tip="Add Product">
+              <div className="tooltip " data-tip="Add Product">
                 <button
-                  className="bg-transparent btn-sm btn btn-circle  mr-5 border-dotted border-slate-500  border-2 rounded-full text-slate-500 cursor-pointer overflow-hidden flex justify-center !content-center"
+                  className="bg-transparent btn-sm btn btn-circle   mr-5 border-dotted border-slate-500  border-2 rounded-full text-slate-500 cursor-pointer overflow-hidden flex justify-center !content-center"
                   onClick={() =>
                     document.getElementById("my_modal_1").showModal()
                   }
@@ -149,26 +177,44 @@ export default function Product() {
                     <select
                       onChange={handleOnChange}
                       name="category"
-                      className="select select-bordered rounded-lg w-full focus:outline-none focus:border-sky-800 focus:ring-sky-500 focus:ring-1oc mb-2"
+                      className={`select select-bordered rounded-lg w-full focus:outline-none focus:border-sky-800 focus:ring-sky-500 focus:ring-1oc mb-2 ${
+                        inputErr && inputErr.category && "border-red-500"
+                      }`}
                       defaultValue="default"
                       required
                     >
                       <option disabled value="default">
-                        Category
+                        Choose Category
                       </option>
                       {category &&
                         category.map((val, key) => (
                           <option key={key}>{val.name}</option>
                         ))}
                     </select>
+                    {inputErr && inputErr.category && (
+                      <small className="text-red-500">
+                        {inputErr.category.msg}
+                      </small>
+                    )}
                     <input
                       type="text"
                       name="name"
                       placeholder="Product Name"
-                      className="input input-bordered rounded-lg w-full focus:outline-none focus:border-sky-800 focus:ring-sky-500 focus:ring-1oc"
+                      className={`input input-bordered rounded-lg w-full focus:outline-none focus:border-sky-800 focus:ring-sky-500 focus:ring-1oc ${
+                        inputErr && inputErr.name && "border-red-500"
+                      }`}
                       onChange={handleOnChange}
                     />
-                    <div className="input mt-2 flex items-center input-bordered rounded-lg w-full focus:outline-none focus-within:border-sky-800 !outline-none focus-within:ring-sky-500 focus:ring-1oc">
+                    {inputErr && inputErr.name && (
+                      <small className="text-red-500">
+                        {inputErr.name.msg}
+                      </small>
+                    )}
+                    <div
+                      className={`input mt-2 flex items-center input-bordered rounded-lg w-full focus:outline-none focus-within:border-sky-800 !outline-none focus-within:ring-sky-500 focus:ring-1oc ${
+                        inputErr && inputErr.price && "border-red-500"
+                      }`}
+                    >
                       <input
                         type="text"
                         placeholder="Price"
@@ -178,6 +224,11 @@ export default function Product() {
                       />
                       <span>USD ($)</span>
                     </div>
+                    {inputErr && inputErr.price && (
+                      <small className="text-red-500">
+                        {inputErr.price.msg}
+                      </small>
+                    )}
                     <textarea
                       type="text"
                       name="description"
@@ -231,56 +282,75 @@ export default function Product() {
                 {/* row 1 */}
 
                 {product &&
-                  product.map((val, key) => (
-                    <tr key={key}>
-                      <td>
-                        <div className="flex items-center gap-3">
-                          <div className="avatar">
-                            <div className="mask mask-squircle w-12 h-12">
-                              <img
-                                src={`http://localhost:5000/products/img/${val.image}`}
-                                alt="Avatar Tailwind CSS Component"
-                              />
+                  product
+                    .filter((item) => {
+                      return search.toLowerCase() === ""
+                        ? item
+                        : item.name.toLowerCase().includes(search) ||
+                            item._id.toLowerCase().includes(search);
+                    })
+                    .map((val, key) => (
+                      <tr key={key}>
+                        <td>
+                          <div className="flex items-center gap-3">
+                            <div className="avatar">
+                              <div className="mask mask-squircle w-12 h-12">
+                                <img
+                                  src={`http://localhost:5000/products/img/${val.image}`}
+                                  alt="Avatar Tailwind CSS Component"
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <Link
+                                to="/viewproduct"
+                                state={val._id}
+                                className="font-bold"
+                              >
+                                {val.name}
+                              </Link>
                             </div>
                           </div>
-                          <div>
-                            <div className="font-bold">{val.name}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className=" max-sm:hidden">
-                        <p className="text-sm opacity-80">{val.description}</p>
-                      </td>
-                      <td>
-                        <p>{val.price}$</p>
-                      </td>
-                      <td>
-                        <span className="uppercase px-3 py-1 text-red-800 font-medium text-xs bg-opacity-40 bg-red-200 rounded-full">
-                          0%
-                        </span>
-                      </td>
-                      <td className="flex gap-3">
-                        <button className="btn btn-sm btn-success text-white btn-circle flex just-center overflow-  content-center !items-center overflow-hidden">
-                          <Mui.ListItemButton className="!flex !justify-center !items-center">
-                            <EditIcon sx={{ fontSize: 18 }} />
-                          </Mui.ListItemButton>
-                        </button>
-                        <button
-                          onClick={() => {
-                            let chk = window.confirm(
-                              "Attention! You want to delete this data!"
-                            );
-                            if (chk === true) handleDelete(val._id);
-                          }}
-                          className="btn btn-sm btn-error text-white btn-circle flex just-center overflow-  content-center !items-center overflow-hidden"
-                        >
-                          <Mui.ListItemButton className="!flex !justify-center !items-center">
-                            <HighlightOffIcon sx={{ fontSize: 18 }} />
-                          </Mui.ListItemButton>
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td className=" max-sm:hidden">
+                          <p className="text-sm opacity-80">
+                            {val.description}
+                          </p>
+                        </td>
+                        <td>
+                          <p>{val.price}$</p>
+                        </td>
+                        <td className="p-0">
+                          <span className="uppercase px-3 py-1 text-red-800 font-medium text-xs bg-opacity-40 bg-red-200 rounded-full">
+                            {val.discount} %
+                          </span>
+                        </td>
+                        <td className="flex gap-3">
+                          <Link
+                            to="/viewproduct"
+                            state={val._id}
+                            className="btn btn-sm btn-success text-white btn-circle flex just-center overflow-  content-center !items-center overflow-hidden"
+                          >
+                            <Mui.ListItemButton className="!flex !justify-center !items-center">
+                              <EditIcon sx={{ fontSize: 18 }} />
+                            </Mui.ListItemButton>
+                          </Link>
+                          <button
+                            onClick={() => {
+                              let chk = window.confirm(
+                                "Attention! You want to delete this data!"
+                              );
+                              if (chk === true) handleDelete(val._id);
+                            }}
+                            className="btn btn-sm btn-error text-white btn-circle flex just-center overflow-  content-center !items-center overflow-hidden"
+                          >
+                            <Mui.ListItemButton className="!flex !justify-center !items-center">
+                              <HighlightOffIcon sx={{ fontSize: 18 }} />
+                            </Mui.ListItemButton>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
               </tbody>
               {/* foot */}
             </table>

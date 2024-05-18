@@ -7,13 +7,16 @@ import SearchIcon from "@mui/icons-material/Search";
 import Animation from "../spinner/Animation";
 import Toast from "../Alert/Toast";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export default function Category() {
   const [data, setData] = useState();
   const [error, setError] = useState(null);
   const [category, setCategory] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [edit, setEdit] = useState(false);
   const closeBtn = useRef(null);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     getCategory();
@@ -33,11 +36,24 @@ export default function Category() {
     try {
       let response;
       if (data && data.id) {
-        response = await axios.put("http://localhost:5000/api/category/", data);
+        response = await axios.put(
+          `http://localhost:5000/api/category/`,
+          data,
+          {
+            headers: {
+              token: Cookies.get("auth"),
+            },
+          }
+        );
       } else {
         response = await axios.post(
-          "http://localhost:5000/api/category/",
-          data
+          `http://localhost:5000/api/category/`,
+          data,
+          {
+            headers: {
+              token: Cookies.get("auth"),
+            },
+          }
         );
       }
       if (response && response.status === 200) {
@@ -55,7 +71,12 @@ export default function Category() {
   const handleDelete = async (delId) => {
     let id = { id: delId };
     const response = await axios
-      .delete("http://localhost:5000/api/category/", { data: id })
+      .delete(`http://localhost:5000/api/category/`, {
+        headers: {
+          token: Cookies.get("auth"),
+        },
+        data: id,
+      })
       .catch((error) => console.error(error.response.data.err));
     console.log(response);
     if (response && response.status === 200) {
@@ -69,7 +90,7 @@ export default function Category() {
   const getCategory = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/category/all"
+        `http://localhost:5000/api/category/all`
       );
       if (response && response.status === 200) {
         setCategory(response.data.category);
@@ -78,6 +99,14 @@ export default function Category() {
       if (error.message === "Network Error")
         return console.error(error.message);
       console.log(error.response.data.message);
+    }
+  };
+  const handleSearch = (e) => {
+    if (e.key === "Backspace" && !e.target.value.trim().length) {
+      setSearch("");
+    }
+    if (e.target.value.trim().length) {
+      setSearch(e.target.value.trim());
     }
   };
 
@@ -98,6 +127,7 @@ export default function Category() {
                   type="text"
                   className="grow max-sm:w-0 "
                   placeholder="Search"
+                  onKeyUpCapture={handleSearch}
                 />
                 <SearchIcon sx={{ fontSize: 20 }} />
               </label>
@@ -120,7 +150,9 @@ export default function Category() {
 
             <dialog id="my_modal_1" className="modal">
               <div className="modal-box">
-                <h3 className="font-bold text-lg">New Category!</h3>
+                <h3 className="font-bold text-lg">
+                  {(!edit && "New") || "Edit"} Category!
+                </h3>
                 <p className="pt-4 ">
                   Press ESC key or click the button below to close
                 </p>
@@ -168,6 +200,9 @@ export default function Category() {
                       </button>
                       <button
                         ref={closeBtn}
+                        onClick={() => {
+                          setEdit(false);
+                        }}
                         className="btn rounded-full bg-slate-500 text-white hover:bg-red-500 "
                       >
                         Close
@@ -190,47 +225,59 @@ export default function Category() {
               </thead>
               <tbody className="table-row-group box-border">
                 {category &&
-                  category.map((val, key) => (
-                    <tr key={key} className="hover table-row align-middle">
-                      <th className="table-cell align-[inherit]">{key + 1}</th>
-                      <td className="table-cell align-[inherit]">{val.name}</td>
-                      <td className="table-cell align-[inherit]">
-                        <span className="uppercase px-3 py-1 text-orange-800 font-medium text-xs bg-opacity-30 bg-orange-200 rounded-full">
-                          {val.products.length}
-                        </span>
-                      </td>
-                      <td className="flex gap-3">
-                        <button
-                          className="btn btn-sm btn-success text-white btn-circle flex just-center overflow-  content-center !items-center overflow-hidden"
-                          onClick={() => {
-                            setData({
-                              name: val.name,
-                              description: val.description,
-                              id: val._id,
-                            });
-                            document.getElementById("my_modal_1").showModal();
-                          }}
-                        >
-                          <Mui.ListItemButton className="!flex !justify-center !items-center">
-                            <EditIcon sx={{ fontSize: 18 }} />
-                          </Mui.ListItemButton>
-                        </button>
-                        <button
-                          className="btn btn-sm btn-error text-white btn-circle flex just-center overflow-  content-center !items-center overflow-hidden"
-                          onClick={() => {
-                            let chk = window.confirm(
-                              "Attention! You want to delete this data!"
-                            );
-                            if (chk === true) handleDelete(val._id);
-                          }}
-                        >
-                          <Mui.ListItemButton className="!flex !justify-center !items-center">
-                            <HighlightOffIcon sx={{ fontSize: 18 }} />
-                          </Mui.ListItemButton>
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  category
+                    .filter((item) => {
+                      return search.toLowerCase() === ""
+                        ? item
+                        : item._id.toLowerCase().includes(search) ||
+                            item.name.toLowerCase().includes(search);
+                    })
+                    .map((val, key) => (
+                      <tr key={key} className="hover table-row align-middle">
+                        <th className="table-cell align-[inherit]">
+                          {key + 1}
+                        </th>
+                        <td className="table-cell align-[inherit]">
+                          {val.name}
+                        </td>
+                        <td className="table-cell align-[inherit]">
+                          <span className="uppercase px-3 py-1 text-orange-800 font-medium text-xs bg-opacity-30 bg-orange-200 rounded-full">
+                            {val.products.length}
+                          </span>
+                        </td>
+                        <td className="flex gap-3">
+                          <button
+                            className="btn btn-sm btn-success text-white btn-circle flex just-center overflow-  content-center !items-center overflow-hidden"
+                            onClick={() => {
+                              setData({
+                                name: val.name,
+                                description: val.description,
+                                id: val._id,
+                              });
+                              setEdit(true);
+                              document.getElementById("my_modal_1").showModal();
+                            }}
+                          >
+                            <Mui.ListItemButton className="!flex !justify-center !items-center">
+                              <EditIcon sx={{ fontSize: 18 }} />
+                            </Mui.ListItemButton>
+                          </button>
+                          <button
+                            className="btn btn-sm btn-error text-white btn-circle flex just-center overflow-  content-center !items-center overflow-hidden"
+                            onClick={() => {
+                              let chk = window.confirm(
+                                "Attention! You want to delete this data!"
+                              );
+                              if (chk === true) handleDelete(val._id);
+                            }}
+                          >
+                            <Mui.ListItemButton className="!flex !justify-center !items-center">
+                              <HighlightOffIcon sx={{ fontSize: 18 }} />
+                            </Mui.ListItemButton>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
               </tbody>
             </table>
           </div>

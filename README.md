@@ -1,6 +1,6 @@
 # MU_Cafeteria
 
-Elevate your cafe with our intuitive online management system. Seamlessly order food and manage bills, enhancing efficiency and customer satisfaction. Revolutionize your cafe experience today.MU_Cafeteria is the ideal solution to modernize the way cafe businesses operate in the digital age.
+Elevate your cafe with our intuitive online cafeteria management system. Seamlessly order food and manage bills, enhancing efficiency and customer satisfaction. Revolutionize your cafe experience today.MU_Cafeteria is the ideal solution to modernize the way cafe businesses operate in the digital age.
 
 ## Quick start
 

@@ -5,8 +5,10 @@ import axios from "axios";
 import Page404 from "../component/Page404";
 import { addToast } from "../redux/ToastSlice";
 import Loading from "../component/Loading";
+import OrderHistory from "../component/OrderHistory";
 import { fetchUser } from "../redux/AuthSlice";
 import { useDispatch, useSelector } from "react-redux";
+import SyncIcon from "@mui/icons-material/Sync";
 
 export default function Profile() {
   const [previewFile, setPreviewFIle] = useState(null);
@@ -15,8 +17,10 @@ export default function Profile() {
   const [error, setError] = useState(null);
   const [loader, setLoader] = useState(true);
   const [order, setOrder] = useState(null);
+  const [product, setProduct] = useState({ product: "", order: "" });
   const dispatch = useDispatch();
   const { isLoading, user, err } = useSelector((state) => state.user);
+
   useEffect(() => {
     window.scrollTo(0, 0);
     dispatch(fetchUser());
@@ -78,6 +82,32 @@ export default function Profile() {
       );
       if (response && response.status === 200) {
         setOrder(response.data.order);
+      }
+    } catch (error) {
+      if (error.message === "Network Error")
+        return console.error(error.message);
+    }
+  };
+
+  const handleOrderStatus = async (id) => {
+    const updateData = {
+      id: id,
+      orderStatus: "Refunded",
+      paymentStatus: false,
+    };
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/api/order/`,
+        updateData,
+        {
+          headers: {
+            token: Cookies.get("auth"),
+          },
+        }
+      );
+      if (response && response.status === 200) {
+        dispatch(addToast({ type: "success", msg: response.data.mess }));
+        getOrder();
       }
     } catch (error) {
       if (error.message === "Network Error")
@@ -259,54 +289,7 @@ export default function Profile() {
           </div>
         </form>
 
-        <div className="container rounded-xl px-10 py-16 max-sm:p-5 max-md:px-5 bg-white">
-          <h3 className="text-3xl text-center text-slate-600">Order History</h3>
-          <div className="overflow-x-auto mt-10 border rounded-lg">
-            <table className="table table-zebra  text-slate-800 table-fixed ">
-              {/* head */}
-              <thead>
-                <tr className="bg-base-300 text-slate-600 uppercase text-sm ">
-                  <th>Order</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {order &&
-                  order
-                    .filter((e) => e.orderStatus == "Pending")
-                    .map((val, key) => (
-                      <tr className="hover " key={key}>
-                        <td>{val.orderNumber}</td>
-
-                        <td>
-                          <span className="uppercase px-3 py-1 text-orange-800 font-medium text-xs bg-opacity-30 bg-orange-200 rounded-full">
-                            {val.orderStatus}
-                          </span>
-                        </td>
-                        <td>
-                          <span className="text-stone-500">
-                            {new Date(val.orderDate).toLocaleDateString(
-                              "en-GB",
-                              {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                              }
-                            )}
-                            ,{" "}
-                          </span>
-                          {new Date(val.orderDate).toLocaleTimeString("en-us", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </td>
-                      </tr>
-                    ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <OrderHistory />
       </section>
     )) || <Page404 />
   );

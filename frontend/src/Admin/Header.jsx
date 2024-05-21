@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as Mui from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import SellIcon from "@mui/icons-material/Sell";
@@ -8,17 +8,26 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import CloseIcon from "@mui/icons-material/Close";
 import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
 import CategoryIcon from "@mui/icons-material/Category";
+import NewspaperIcon from "@mui/icons-material/Newspaper";
 import ContactsIcon from "@mui/icons-material/Contacts";
 import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
+import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber";
 import GroupsIcon from "@mui/icons-material/Groups";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import logo from "../img/orderNow.png";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useSelector } from "react-redux";
+import MoveToInboxIcon from "@mui/icons-material/MoveToInbox";
 
 export default function Header() {
   const { isLoading, user, err } = useSelector((state) => state.user);
+  const [message, setMessage] = useState(null);
+
+  useEffect(() => {
+    getMessage();
+  }, [0]);
+
   const [drawerActive, setDrawerActive] = useState({
     left: false,
     bottom: false,
@@ -38,6 +47,25 @@ export default function Header() {
     if (anchor === "bottom") setDrawerActive({ bottom: open });
     if (anchor === "right") setDrawerActive({ right: open });
     if (anchor === "top") setDrawerActive({ top: open });
+  };
+
+  const getMessage = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/message/all`,
+        {
+          headers: {
+            token: Cookies.get("auth"),
+          },
+        }
+      );
+      if (response && response.status === 200) {
+        setMessage(response.data.message);
+      }
+    } catch (error) {
+      if (error.message === "Network Error")
+        return console.error(error.message);
+    }
   };
 
   const logOut = async () => {
@@ -138,21 +166,17 @@ export default function Header() {
             </button>
             <ul
               tabIndex={0}
-              className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
+              className="mt-3 z-[1] p-2 shadow-lg menu menu-sm dropdown-content bg-base-100 rounded-box w-52 "
             >
-              <li>
-                <a href="#" className="justify-between">
-                  Profile
-                </a>
-              </li>
-              <li>
-                <a
-                  onClick={() => {
-                    logOut();
-                  }}
-                >
-                  Logout
-                </a>
+              <li className="border-b-2 mb-2">
+                {message &&
+                  message
+                    .slice(message.length - 5, message.length)
+                    .map((val, key) => (
+                      <Link to="/message">
+                        <p className="py-1 text-sky-800">{val.subject}</p>
+                      </Link>
+                    ))}
               </li>
             </ul>
           </div>
@@ -175,7 +199,7 @@ export default function Header() {
             </div>
             <ul
               tabIndex={0}
-              className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
+              className="mt-3 z-[1] p-2 shadow-lg menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
             >
               <li>
                 <NavLink to="setting" className="justify-between">
@@ -211,8 +235,10 @@ export default function Header() {
           </div>
           <div className="my-5 text-left px-5 mt-12">
             <div className="item-color rounded-lg px-5 py-3">
-              <h3 className="text-lg font-bold text-white">Admin</h3>
-              <h3>admin@mail.com</h3>
+              <h3 className="text-lg font-bold text-white">
+                {user.fName + " " + user.lName}
+              </h3>
+              <h3>{user.email}</h3>
             </div>
           </div>
           <Mui.Divider className="bg-slate-700" />
@@ -287,9 +313,25 @@ export default function Header() {
             <NavLink to="coupon">
               <Mui.ListItemButton className="font-thin item-btn">
                 <span className="mr-5">
-                  <ContactsIcon fontSize="small" className="icon" />
+                  <ConfirmationNumberIcon fontSize="small" className="icon" />
                 </span>
                 <span className="font-semibold text-sm">Coupon Code</span>
+              </Mui.ListItemButton>
+            </NavLink>
+            <NavLink to="message">
+              <Mui.ListItemButton className="font-thin item-btn">
+                <span className="mr-5">
+                  <MoveToInboxIcon fontSize="small" className="icon" />
+                </span>
+                <span className="font-semibold text-sm">Message</span>
+              </Mui.ListItemButton>
+            </NavLink>
+            <NavLink to="all-news">
+              <Mui.ListItemButton className="font-thin item-btn">
+                <span className="mr-5">
+                  <NewspaperIcon fontSize="small" className="icon" />
+                </span>
+                <span className="font-semibold text-sm">News</span>
               </Mui.ListItemButton>
             </NavLink>
 

@@ -6,16 +6,16 @@ import Cookies from "js-cookie";
 import { useDispatch, useSelector } from "react-redux";
 import CheckOut from "./CheckOut";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import { addToast } from "../redux/ToastSlice";
 import CloseIcon from "@mui/icons-material/Close";
+import LocalMallOutlinedIcon from "@mui/icons-material/LocalMallOutlined";
 
 export default function NavBar() {
   const urlParams = new URLSearchParams(window.location.search);
   const [haveToken, setHaveToken] = useState(false);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { isLoading, user, err } = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.user);
+  const { size } = useSelector((state) => state.cart);
   const token = Cookies.get("auth");
   useEffect(() => {
     if (token) {
@@ -170,13 +170,23 @@ export default function NavBar() {
               <NavLink to="contactus">
                 <li className="nav-link">Contact Us</li>
               </NavLink>
-              <li className="nav-link">
-                <span onClick={toggleDrawer("bottom", true)}>Cart</span>
-              </li>
             </ul>
           </div>
 
           <div className="navbar-end">
+            <button
+              onClick={toggleDrawer("bottom", true)}
+              className="btn btn-circle btn-md mr-5 text-slate-700 hidden lg:block"
+            >
+              <div className="indicator">
+                <LocalMallOutlinedIcon />
+                {Boolean(size) && (
+                  <span className="badge badge-xs text-red-700 indicator-item ">
+                    {size}
+                  </span>
+                )}
+              </div>
+            </button>
             {!haveToken && (
               <a
                 href="/login"
@@ -215,13 +225,13 @@ export default function NavBar() {
                     <NavLink to="changepwd">Change Password</NavLink>
                   </li>
                   <li>
-                    <a
+                    <span
                       onClick={() => {
                         logOut();
                       }}
                     >
                       Logout
-                    </a>
+                    </span>
                   </li>
                 </ul>
               </div>

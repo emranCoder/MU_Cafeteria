@@ -14,9 +14,9 @@ export default function PaymentStatus() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [edit, setEdit] = useState(false);
   const [order, setOrder] = useState(null);
-  const [product, setProduct] = useState(null);
   const [success, setSuccess] = useState(null);
   const [search, setSearch] = useState("");
+  const [product, setProduct] = useState({ product: "", order: "" });
 
   useEffect(() => {
     getOrder();
@@ -121,8 +121,8 @@ export default function PaymentStatus() {
               <div className="modal-action">
                 <form method="dialog" className="w-full">
                   <div className="grid grid-cols-2 gap-3">
-                    {product &&
-                      product.map((val, key) => (
+                    {product.product &&
+                      product.product.map((val, key) => (
                         <div
                           key={key}
                           className=" bg-white shadow-md py-5 max-sm:p-2 hover:border-slate-700 border-slate-700 border-opacity-20 border cursor-pointer ease-out duration-75  rounded-2xl hover:bg-[rgb(255,248,248)] "
@@ -162,6 +162,52 @@ export default function PaymentStatus() {
                       </p>
                     )}
                   </div>
+
+                  {product.order && (
+                    <div className="col-lg-12 col-md-12 max-sm:w-full max-md:w-full mt-5">
+                      <div className="list px-5 ">
+                        <div className="w-full ">
+                          <div className="w-full border-b">
+                            <span>Subtotal: </span>
+                            <span className="float-right">
+                              {/^-?[0-9]+$/.test(
+                                Number(product.order.currentPrice)
+                              )
+                                ? Number(product.order.currentPrice) +
+                                  Number(product.order.discount)
+                                : (
+                                    Number(product.order.currentPrice) +
+                                    Number(product.order.discount)
+                                  ).toFixed(2)}{" "}
+                              $
+                            </span>
+                          </div>
+                          <div className="w-full border-b">
+                            <span>Discount:</span>
+                            <span className="float-right">
+                              {/^-?[0-9]+$/.test(Number(product.order.discount))
+                                ? Number(product.order.discount)
+                                : Number(product.order.discount).toFixed(2)}
+                              $
+                            </span>
+                          </div>
+                          <div className="w-full">
+                            <span>Total: </span>
+                            <span className="float-right">
+                              {/^-?[0-9]+$/.test(
+                                Number(product.order.currentPrice)
+                              )
+                                ? Number(product.order.currentPrice)
+                                : Number(product.order.currentPrice).toFixed(
+                                    2
+                                  )}{" "}
+                              $
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   <div className="w-full flex justify-end mt-5">
                     <button className="btn  rounded-full bg-transparent text-slate-700 border-slate-700 border hover:bg-red-500  hover:text-slate-50">
                       Close
@@ -211,13 +257,26 @@ export default function PaymentStatus() {
                               item.user.lName.toLowerCase().includes(search) ||
                               item.user._id.toLowerCase().includes(search);
                       })
-                      .sort((e) => e.orderStatus == "Pending")
+                      .sort((e) => e.paymentStatus == true)
                       .map((val, key) => (
-                        <tr className="hover ">
+                        <tr
+                          className={`hover  ${
+                            val.paymentStatus
+                              ? ""
+                              : "!bg-rose-50 !border-rose-300"
+                          }`}
+                        >
                           <td>
                             <span
                               onClick={() => {
-                                setProduct(JSON.parse(val.products));
+                                setProduct({
+                                  product: JSON.parse(val.products),
+                                  order: {
+                                    currentPrice: val.orderPrice,
+                                    discount: val.discount,
+                                    orderDate: val.orderDate,
+                                  },
+                                });
                                 document
                                   .getElementById("view_product")
                                   .showModal();
@@ -228,9 +287,10 @@ export default function PaymentStatus() {
                             </span>
                           </td>
                           <td>
-                            {JSON.parse(val.products).length > 1
+                            {JSON.parse(val.products) &&
+                            JSON.parse(val.products).length > 1
                               ? JSON.parse(val.products).length + ", Products"
-                              : JSON.parse(val.products).name}
+                              : JSON.parse(val.products)[0].name}
                           </td>
                           <td className="hover:text-sky-900 ">
                             <Link to="/view" state={val.user._id}>
@@ -251,24 +311,28 @@ export default function PaymentStatus() {
                             </span>
                           </td>
                           <td>
-                            <span className="text-stone-500">
-                              {new Date(val.orderDate).toLocaleDateString(
-                                "en-GB",
+                            <span className="text-center grid justify-center">
+                              {" "}
+                              <span className="text-stone-500">
+                                {new Date(val.orderDate).toLocaleDateString(
+                                  "en-GB",
+                                  {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric",
+                                  }
+                                )}
+                                ,{" "}
+                              </span>
+                              <br />
+                              {new Date(val.orderDate).toLocaleTimeString(
+                                "en-us",
                                 {
-                                  day: "numeric",
-                                  month: "short",
-                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
                                 }
                               )}
-                              ,{" "}
                             </span>
-                            {new Date(val.orderDate).toLocaleTimeString(
-                              "en-us",
-                              {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              }
-                            )}
                           </td>
                           <td className="flex gap-5 justify  ">
                             <div className="tooltip" data-tip="Paid">

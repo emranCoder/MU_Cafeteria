@@ -17,7 +17,7 @@ export default function HomeInfo() {
     getProductFrequency();
     getOrderFrequency();
     getUserFrequency();
-  }, []);
+  }, [0]);
 
   const [productFrequency, setProductFrequency] = useState(0);
   const [orderFrequency, setOrderFrequency] = useState(0);
@@ -29,7 +29,7 @@ export default function HomeInfo() {
     userFrequency,
     (orderFrequency && orderFrequency.length) || 0,
   ];
-  const barData = [44, 55, 41, 67, charData, 43, 21, 33, 45, 31, 87, 65];
+  const barData = [44, 55, 41, 67, parseInt(charData / 2)];
 
   const getProductFrequency = async () => {
     try {
@@ -64,7 +64,10 @@ export default function HomeInfo() {
             (val) =>
               new Date(val.orderDate).getMonth() === new Date().getMonth()
           )
-          .map((el) => setChartData(data + Number(el.orderPrice)));
+          .forEach((el) =>
+            setChartData((charData) => charData + Number(el.orderPrice))
+          );
+
         setOrderFrequency(response.data.order);
         setIncome(response.data.total);
       }

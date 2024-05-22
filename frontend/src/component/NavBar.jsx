@@ -66,9 +66,10 @@ export default function NavBar() {
         return console.error(error.message);
       console.log(error.response.data.message);
     }
+    dispatch(addToast({ type: "info", msg: response.data.mess }));
     Cookies.remove("auth");
     Cookies.remove("id");
-    window.location.replace("/admin-login?true=forget");
+    window.location.replace("/?forget=true");
   };
 
   const SideBar = (

@@ -68,7 +68,7 @@ If nodemon is not installed on your system then globally must be installed. Open
 - [Fuad Hasan -(221-115-129)](https://github.com/FuadHasan199)
 - [Ayan Deb Nath-(221-115-132)](https://github.com/Ayannath12)
 
-## Look of My Project
+## Look of The Site
 ![Screenshot 2024-05-22 at 16-18-32 MU_Cafeteria](https://github.com/emranCoder/MU_Cafeteria/assets/105363909/aedb1f95-71ab-450d-9e01-e821c04243c1)
 ![Screenshot 2024-05-22 at 16-22-10 MU_Cafeteria](https://github.com/emranCoder/MU_Cafeteria/assets/105363909/ffdcd7c4-a0d1-4aa3-9567-b8cdf4eff483)
 ![Screenshot 2024-05-22 at 16-25-50 MU_Cafeteria](https://github.com/emranCoder/MU_Cafeteria/assets/105363909/ea120dc2-a22f-49a3-89a5-fac51d888722)

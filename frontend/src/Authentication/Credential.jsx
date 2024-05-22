@@ -82,6 +82,7 @@ export default function Credential() {
         }
       } catch (error) {
         if (error && error.response) {
+          console.log(error.response);
           if (error.response.data) {
             if (error.response.data.err.email) {
               const err = error.response.data.err.email.msg;
@@ -113,7 +114,7 @@ export default function Credential() {
         <div className="col-lg-1 max-md:block hidden max-sm:block mt-0">
           {" "}
           <h3 className="text-[50px] font-serif font-bold text-slate-800 mb-10 mt-8">
-             MU_Cafeteria
+            MU_Cafeteria
           </h3>
         </div>
         <div className="col-lg-5 col-md-9 max-sm:w-full">

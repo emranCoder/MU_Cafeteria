@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Drawer } from "@mui/material";
 import { NavLink } from "react-router-dom";
-import logo from "../img/orderNow.png";
+import logo from "../img/MU_Cafeteria.png";
 import Cookies from "js-cookie";
 import { useDispatch, useSelector } from "react-redux";
 import CheckOut from "./CheckOut";
@@ -143,7 +143,7 @@ export default function NavBar() {
             >
               <img src={logo} className="h-12" alt="Flowbite Logo" />
               <span className="self-center font-serif text-2xl font-semibold whitespace-nowrap dark:text-slate-50">
-                OrderNow
+                MU_Cafeteria
               </span>
             </a>
           </div>
@@ -154,7 +154,7 @@ export default function NavBar() {
           >
             <img src={logo} className="h-9 max-sm:h-12 w-24" alt="logo" />
             <span className="self-center  max-sm:hidden  text-2xl font-semibold whitespace-nowrap dark:text-slate-50 font-serif">
-              OrderNow
+              MU_Cafeteria
             </span>
           </a>
           <div className="w-full justify-center lg:flex hidden">
@@ -207,9 +207,10 @@ export default function NavBar() {
                     <img
                       alt="Tailwind CSS Navbar component"
                       src={
-                        (user &&
-                          `http://localhost:5000/avatar/${user.avatar} `) ||
-                        "default-avatar.png"
+                        user &&
+                        `http://localhost:5000/avatar/${
+                          user.avatar ? user.avatar : "default-avatar.png"
+                        } `
                       }
                     />
                   </div>

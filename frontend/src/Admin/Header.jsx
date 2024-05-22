@@ -14,7 +14,7 @@ import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantity
 import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber";
 import GroupsIcon from "@mui/icons-material/Groups";
 import { Link, NavLink } from "react-router-dom";
-import logo from "../img/orderNow.png";
+import logo from "../img/MU_Cafeteria.png";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useSelector } from "react-redux";
@@ -128,7 +128,7 @@ export default function Header() {
           >
             <img src={logo} className="h-12" alt="Flowbite Logo" />
             <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-              OrderNow
+              MU_Cafeteria
             </span>
           </a>
         </div>
@@ -139,7 +139,7 @@ export default function Header() {
         >
           <img src={logo} className="h-9 max-sm:h-12 " alt="logo" />
           <span className="self-center  max-sm:hidden  text-2xl font-semibold whitespace-nowrap dark:text-white">
-            OrderNow
+            MU_Cafeteria
           </span>
         </a>
 
@@ -191,8 +191,10 @@ export default function Header() {
                 <img
                   alt="loading"
                   src={
-                    (user && `http://localhost:5000/avatar/${user.avatar}`) ||
-                    "default-avatar.png"
+                    user &&
+                    `http://localhost:5000/avatar/${
+                      user.avatar ? user.avatar : "default-avatar.png"
+                    } `
                   }
                 />
               </div>

@@ -4,7 +4,7 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import Loading from "../component/Loading";
 import { addToast } from "../redux/ToastSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 export default function ChangePwd() {
   const [loader, setLoader] = useState(true);
@@ -98,6 +98,12 @@ export default function ChangePwd() {
           const { message, user } = response.data;
           dispatch(addToast({ type: "success", msg: message }));
           setLoader(false);
+          setTimeout(() => {
+            Cookies.remove("auth");
+            Cookies.remove("id");
+            localStorage.clear();
+            window.location.replace("/login");
+          }, 2000);
         }
       } catch (error) {
         if (error && error.response.data) {

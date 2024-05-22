@@ -139,7 +139,7 @@ export default function PaymentStatus() {
                             </div>
                             <div className="max-sm:ml-3 text-center max-sm:text-left ">
                               <p className="text-lg max-sm:m-0  mt-3  my-1 text-slate-900">
-                                {val.name}
+                                {Boolean(val.name) ? val.name : "Not Found"}
                               </p>
                               <p className="my-1 font-semibold text-slate-900">
                                 {val.discount > 0 && (
@@ -291,7 +291,9 @@ export default function PaymentStatus() {
                             {JSON.parse(val.products) &&
                             JSON.parse(val.products).length > 1
                               ? JSON.parse(val.products).length + ", Products"
-                              : JSON.parse(val.products)[0].name}
+                              : Boolean(JSON.parse(val.products)[0])
+                              ? JSON.parse(val.products)[0].name
+                              : console.log(JSON.parse(val.products))}
                           </td>
                           <td className="hover:text-sky-900 ">
                             <Link to="/view" state={val.user._id}>

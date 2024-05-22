@@ -8,18 +8,14 @@ import Loading from "../component/Loading";
 import OrderHistory from "../component/OrderHistory";
 import { fetchUser } from "../redux/AuthSlice";
 import { useDispatch, useSelector } from "react-redux";
-import SyncIcon from "@mui/icons-material/Sync";
 
 export default function Profile() {
   const [previewFile, setPreviewFIle] = useState(null);
-  const [data, setData] = useState(null);
   const [update, setUpdate] = useState(null);
   const [error, setError] = useState(null);
   const [loader, setLoader] = useState(true);
-  const [order, setOrder] = useState(null);
-  const [product, setProduct] = useState({ product: "", order: "" });
   const dispatch = useDispatch();
-  const { isLoading, user, err } = useSelector((state) => state.user);
+  const { isLoading, user } = useSelector((state) => state.user);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -27,15 +23,11 @@ export default function Profile() {
     setTimeout(() => {
       setLoader(isLoading);
     }, 500);
-    getOrder();
   }, [0]);
   const handleOnChange = (e) => {
     const { name, value } = e.target;
-    if (name === "mobile") {
-      setUpdate({ ...update, [name]: "+88" + value });
-    } else {
-      setUpdate({ ...update, [name]: value });
-    }
+
+    setUpdate({ ...update, [name]: value });
   };
   console.log(update);
   const handleSubmit = async (e) => {
@@ -47,6 +39,13 @@ export default function Profile() {
       userUpdate.append("oldImg", user.avatar);
 
       try {
+        if (userUpdate.get("mobile")) {
+          const mobile = userUpdate.get("mobile");
+          userUpdate.set(
+            "mobile",
+            mobile.slice(0, 3) === "+88" ? mobile : "+88" + mobile
+          );
+        }
         const response = await axios.put(
           `http://localhost:5000/api/auth/updateuser`,
           userUpdate,
@@ -63,6 +62,7 @@ export default function Profile() {
           dispatch(addToast({ type: "success", msg: message }));
           setUpdate(null);
           dispatch(fetchUser());
+
           setLoader(false);
         }
       } catch (error) {
@@ -71,52 +71,6 @@ export default function Profile() {
           console.log(error.response.data);
         }
       }
-    }
-  };
-
-  const getOrder = async () => {
-    const id = Cookies.get("id");
-    try {
-      const response = await axios.get(
-        `http://localhost:5000/api/order/user/${id}`,
-        {
-          headers: {
-            token: Cookies.get("auth"),
-          },
-        }
-      );
-      if (response && response.status === 200) {
-        setOrder(response.data.order);
-      }
-    } catch (error) {
-      if (error.message === "Network Error")
-        return console.error(error.message);
-    }
-  };
-
-  const handleOrderStatus = async (id) => {
-    const updateData = {
-      id: id,
-      orderStatus: "Refunded",
-      paymentStatus: false,
-    };
-    try {
-      const response = await axios.put(
-        `http://localhost:5000/api/order/`,
-        updateData,
-        {
-          headers: {
-            token: Cookies.get("auth"),
-          },
-        }
-      );
-      if (response && response.status === 200) {
-        dispatch(addToast({ type: "success", msg: response.data.mess }));
-        getOrder();
-      }
-    } catch (error) {
-      if (error.message === "Network Error")
-        return console.error(error.message);
     }
   };
 
@@ -165,6 +119,11 @@ export default function Profile() {
                       >
                         Upload Picture
                       </label>
+                      {error && error.avatar && (
+                        <small className="text-red-500">
+                          {error.avatar.msg}
+                        </small>
+                      )}
                       <input
                         type="file"
                         name="staffImage"
@@ -205,6 +164,11 @@ export default function Profile() {
                       >
                         First name
                       </label>
+                      {error && error.fName && (
+                        <small className="text-red-500">
+                          {error.fName.msg}
+                        </small>
+                      )}
                     </div>
                     <div className="relative z-0 w-full mb-5 group">
                       <input
@@ -224,6 +188,11 @@ export default function Profile() {
                         {" "}
                         Last name
                       </label>
+                      {error && error.lName && (
+                        <small className="text-red-500">
+                          {error.lName.msg}
+                        </small>
+                      )}
                     </div>
                   </div>
                   <div className="relative z-0 w-full mb-5 group mt-5">
@@ -242,6 +211,9 @@ export default function Profile() {
                     >
                       Email address
                     </label>
+                    {error && error.email && (
+                      <small className="text-red-500">{error.email.msg}</small>
+                    )}
                   </div>
 
                   <div className="grid md:grid-cols-2 md:gap-6 pt-5">
@@ -255,7 +227,7 @@ export default function Profile() {
                         defaultValue={user.mobile}
                         placeholder=" "
                         onKeyPress={(e) => {
-                          if (!/^[.0-9\b]+$/.test(e.key)) e.preventDefault();
+                          if (!/^[0-9\b]+$/.test(e.key)) e.preventDefault();
                         }}
                         required
                       />
@@ -265,6 +237,11 @@ export default function Profile() {
                       >
                         Phone number (123-456-7890)
                       </label>
+                      {error && error.mobile && (
+                        <small className="text-red-500">
+                          {error.mobile.msg}
+                        </small>
+                      )}
                     </div>
                     <div className="relative z-0 w-full mb-5 group">
                       <input
@@ -283,6 +260,9 @@ export default function Profile() {
                       >
                         Address
                       </label>
+                      {error && error.addr && (
+                        <small className="text-red-500">{error.addr.msg}</small>
+                      )}
                     </div>
                   </div>
                 </div>

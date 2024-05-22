@@ -27,6 +27,7 @@ Install dependencies for backend & frontend
 ```bash
   npm run serve
 ```
+
 First, navigate to the backend folder and rename the .env.example file to .env. Then, repeat this operation for the frontend folder by renaming its .env.example file to .env.
 
 **Additionally, remember to add your email and password to these .env files. Without this information, the system will not be able to send OTPs, and the registration process will not function correctly.**
@@ -44,13 +45,13 @@ If nodemon is not installed on your system then globally must be installed. Open
 ```
 
 ## Features
+
 - User Authentication
 - Menu Management
 - Order Placement
-- Admin Panel 
+- Admin Panel
 - News Feed
 - Staffs Record
-
 
 ## Tech Stack
 

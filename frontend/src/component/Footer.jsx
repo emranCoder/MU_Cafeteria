@@ -43,7 +43,7 @@ export default function Footer() {
           <aside className="items-center grid-flow-col">
             <FaSlackHash className="text-[35px]" />
             <p>
-              OrderNow <br />
+              MU_Cafeteria <br />
               Developed by{" "}
               <a target="_blank" href="http://github.com/emrancoder">
                 emranCoder

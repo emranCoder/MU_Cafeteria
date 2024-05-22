@@ -45,8 +45,11 @@ export default function Footer() {
             <p>
               MU_Cafeteria <br />
               Developed by{" "}
-              <a target="_blank" href="http://github.com/emrancoder">
-                emranCoder
+              <a
+                target="_blank"
+                href="http://github.com/emrancoder/MU_Cafeteria"
+              >
+                MU_Cafeteria
               </a>
             </p>
           </aside>
